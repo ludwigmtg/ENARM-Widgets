@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>ENARM · 365 días</title>
+  <style>
+    :root {
+      --background: #ffffff;
+      --past: #66645f;
+      --future: #eeedea;
+      --future-alt: #e1e0dc;
+      --past-alt: #807d75;
+      --today: #c66b4e;
+      --outline: #b45c41;
+      --radius: 2px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --background: #191919;
+        --past: #b8b6b0;
+        --future: #333332;
+        --future-alt: #3e3e3b;
+        --past-alt: #9b9993;
+        --today: #d88b68;
+        --outline: #e2a081;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body { background: var(--background); }
+    main {
+      width: 100%; height: 100%; padding: 12px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #calendar { position: relative; width: 100%; height: 100%; }
+    .day { position: absolute; background: var(--future); border-radius: var(--radius); }
+    .day[data-month-tone="alternate"] { background: var(--future-alt); }
+    .day.past { background: var(--past); }
+    .day.past[data-month-tone="alternate"] { background: var(--past-alt); }
+    .day.today, .day.today[data-month-tone="alternate"] {
+      background: var(--today);
+      box-shadow: inset 0 0 0 1px var(--outline);
+      z-index: 2;
+      animation: today-pulse 2.8s ease-in-out infinite;
+    }
+    .day.today::after {
+      content: ""; position: absolute; inset: -1px;
+      border: 1px solid var(--today); border-radius: 3px;
+      pointer-events: none;
+      animation: today-halo 2.8s ease-out infinite;
+    }
+    @keyframes today-pulse {
+      0%, 100% { filter: brightness(1); transform: scale(1); }
+      28% { filter: brightness(1.22); transform: scale(1.09); }
+      65% { filter: brightness(1); transform: scale(1); }
+    }
+    @keyframes today-halo {
+      0% { opacity: 0; transform: scale(1); }
+      18% { opacity: 0.65; transform: scale(1.05); }
+      78%, 100% { opacity: 0; transform: scale(1.75); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .day.today, .day.today::after { animation: none; }
+      .day.today::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div id="calendar" role="img" aria-label="Calendario visual de preparación para el ENARM"></div>
+  </main>
+  <script>
+    'use strict';
+    // CONFIGURACIÓN: fecha estimada, editable; el día del examen queda excluido.
+    const TARGET_DATE = '2027-09-27';
+    const TIME_ZONE = 'America/Monterrey';
+    const DAYS = 365;
+    const DAY_MS = 86400000;
+    // Aritmética de fechas civiles en UTC: evita desfases por horario de verano.
+    const [year, month, day] = TARGET_DATE.split('-').map(Number);
+    const targetDay = Date.UTC(year, month - 1, day) / DAY_MS;
+    const startDay = targetDay - DAYS;
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: TIME_ZONE, year: 'numeric', month: '2-digit', day: '2-digit'
+    });
+    function civilDay(now) {
+      const parts = Object.fromEntries(formatter.formatToParts(now)
+        .filter(part => part.type !== 'literal').map(part => [part.type, part.value]));
+      return Date.UTC(+parts.year, +parts.month - 1, +parts.day) / DAY_MS;
+    }
+    const calendar = document.getElementById('calendar');
+    const fragment = document.createDocumentFragment();
+    const cells = Array.from({ length: DAYS }, (_, index) => {
+      const cell = document.createElement('span');
+      cell.className = 'day';
+      cell.setAttribute('aria-hidden', 'true');
+      cell.dataset.date = new Date((startDay + index) * DAY_MS).toISOString().slice(0, 10);
+      fragment.appendChild(cell);
+      return cell;
+    });
+    calendar.appendChild(fragment);
+    let monthIndex = 0;
+    cells.forEach((cell, index) => {
+      if (index > 0 && cell.dataset.date.slice(0, 7) !== cells[index - 1].dataset.date.slice(0, 7)) monthIndex++;
+      cell.dataset.monthTone = monthIndex % 2 ? 'alternate' : 'base';
+    });
+    let lastDay;
+    function update() {
+      const today = civilDay(new Date());
+      if (today === lastDay) return;
+      lastDay = today;
+      cells.forEach((cell, index) => {
+        const date = startDay + index;
+        cell.className = date < today ? 'day past' : date === today ? 'day today' : 'day';
+      });
+    }
+    // Retícula uniforme: los meses se distinguen solo por tonos alternos.
+    function arrange(size, width) {
+      const gap = size * 0.25;
+      let x = 0, y = 0, usedWidth = 0;
+      const positions = [];
+      for (let i = 0; i < DAYS; i++) {
+        let nextX = i === 0 ? 0 : x + gap;
+        if (nextX + size > width + 0.0001) {
+          nextX = 0;
+          y += size + gap;
+        }
+        positions.push([nextX, y]);
+        x = nextX + size;
+        usedWidth = Math.max(usedWidth, x);
+      }
+      return { positions, width: usedWidth, height: y + size };
+    }
+    function resize() {
+      const width = calendar.clientWidth;
+      const height = calendar.clientHeight;
+      if (width <= 0 || height <= 0) return;
+      // Buscar el mayor cuadrado que cabe considerando AMBAS dimensiones.
+      // Al aumentar la altura se reducen las columnas y crecen los cuadrados.
+      let low = 0, high = Math.min(width, height);
+      for (let i = 0; i < 40; i++) {
+        const middle = (low + high) / 2;
+        if (arrange(middle, width).height <= height) low = middle;
+        else high = middle;
+      }
+      const size = low;
+      const layout = arrange(size, width);
+      const offsetX = Math.max(0, (width - layout.width) / 2);
+      const offsetY = Math.max(0, (height - layout.height) / 2);
+      cells.forEach((cell, index) => {
+        const [x, y] = layout.positions[index];
+        cell.style.width = `${size}px`;
+        cell.style.height = `${size}px`;
+        cell.style.left = `${x + offsetX}px`;
+        cell.style.top = `${y + offsetY}px`;
+      });
+    }
+    update();
+    resize();
+    new ResizeObserver(resize).observe(calendar);
+    // Se actualiza al cambiar el día (máximo 1 segundo después) y al reabrir.
+    setInterval(update, 1000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) update();
+    });
+    window.addEventListener('pageshow', update);
+  </script>
+</body>
+</html>
