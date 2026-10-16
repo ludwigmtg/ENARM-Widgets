@@ -10,6 +10,8 @@
       --background: #ffffff;
       --past: #66645f;
       --future: #eeedea;
+      --future-alt: #e1e0dc;
+      --past-alt: #807d75;
       --today: #c66b4e;
       --outline: #b45c41;
       --radius: 2px;
@@ -19,6 +21,8 @@
         --background: #191919;
         --past: #b8b6b0;
         --future: #333332;
+        --future-alt: #3e3e3b;
+        --past-alt: #9b9993;
         --today: #d88b68;
         --outline: #e2a081;
       }
@@ -30,12 +34,36 @@
       width: 100%; height: 100%; padding: 12px;
       display: flex; align-items: center; justify-content: center;
     }
-    #calendar { display: grid; flex: none; }
-    .day { background: var(--future); border-radius: var(--radius); }
+    #calendar { position: relative; width: 100%; height: 100%; }
+    .day { position: absolute; background: var(--future); border-radius: var(--radius); }
+    .day[data-month-tone="alternate"] { background: var(--future-alt); }
     .day.past { background: var(--past); }
-    .day.today {
+    .day.past[data-month-tone="alternate"] { background: var(--past-alt); }
+    .day.today, .day.today[data-month-tone="alternate"] {
       background: var(--today);
       box-shadow: inset 0 0 0 1px var(--outline);
+      z-index: 2;
+      animation: today-pulse 2.8s ease-in-out infinite;
+    }
+    .day.today::after {
+      content: ""; position: absolute; inset: -1px;
+      border: 1px solid var(--today); border-radius: 3px;
+      pointer-events: none;
+      animation: today-halo 2.8s ease-out infinite;
+    }
+    @keyframes today-pulse {
+      0%, 100% { filter: brightness(1); transform: scale(1); }
+      28% { filter: brightness(1.22); transform: scale(1.09); }
+      65% { filter: brightness(1); transform: scale(1); }
+    }
+    @keyframes today-halo {
+      0% { opacity: 0; transform: scale(1); }
+      18% { opacity: 0.65; transform: scale(1.05); }
+      78%, 100% { opacity: 0; transform: scale(1.75); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .day.today, .day.today::after { animation: none; }
+      .day.today::after { display: none; }
     }
   </style>
 </head>
@@ -73,6 +101,11 @@
       return cell;
     });
     calendar.appendChild(fragment);
+    let monthIndex = 0;
+    cells.forEach((cell, index) => {
+      if (index > 0 && cell.dataset.date.slice(0, 7) !== cells[index - 1].dataset.date.slice(0, 7)) monthIndex++;
+      cell.dataset.monthTone = monthIndex % 2 ? 'alternate' : 'base';
+    });
     let lastDay;
     function update() {
       const today = civilDay(new Date());
@@ -83,23 +116,50 @@
         cell.className = date < today ? 'day past' : date === today ? 'day today' : 'day';
       });
     }
+    // Retícula uniforme: los meses se distinguen solo por tonos alternos.
+    function arrange(size, width) {
+      const gap = size * 0.25;
+      let x = 0, y = 0, usedWidth = 0;
+      const positions = [];
+      for (let i = 0; i < DAYS; i++) {
+        let nextX = i === 0 ? 0 : x + gap;
+        if (nextX + size > width + 0.0001) {
+          nextX = 0;
+          y += size + gap;
+        }
+        positions.push([nextX, y]);
+        x = nextX + size;
+        usedWidth = Math.max(usedWidth, x);
+      }
+      return { positions, width: usedWidth, height: y + size };
+    }
     function resize() {
-      const width = Math.max(1, document.documentElement.clientWidth - 24);
-      const height = Math.max(1, document.documentElement.clientHeight - 24);
-      // Retícula horizontal; cuadrados iguales incluso si el embed es bajo.
-      const columns = Math.min(73, Math.max(15, Math.floor(width / 17)));
-      const rows = Math.ceil(DAYS / columns);
-      const unit = Math.min(width / columns, height / rows);
-      const gap = Math.min(5, unit * 0.26);
-      const size = Math.min((width - gap * (columns - 1)) / columns,
-                            (height - gap * (rows - 1)) / rows);
-      calendar.style.gridTemplateColumns = `repeat(${columns}, ${size}px)`;
-      calendar.style.gridAutoRows = `${size}px`;
-      calendar.style.gap = `${gap}px`;
+      const width = calendar.clientWidth;
+      const height = calendar.clientHeight;
+      if (width <= 0 || height <= 0) return;
+      // Buscar el mayor cuadrado que cabe considerando AMBAS dimensiones.
+      // Al aumentar la altura se reducen las columnas y crecen los cuadrados.
+      let low = 0, high = Math.min(width, height);
+      for (let i = 0; i < 40; i++) {
+        const middle = (low + high) / 2;
+        if (arrange(middle, width).height <= height) low = middle;
+        else high = middle;
+      }
+      const size = low;
+      const layout = arrange(size, width);
+      const offsetX = Math.max(0, (width - layout.width) / 2);
+      const offsetY = Math.max(0, (height - layout.height) / 2);
+      cells.forEach((cell, index) => {
+        const [x, y] = layout.positions[index];
+        cell.style.width = `${size}px`;
+        cell.style.height = `${size}px`;
+        cell.style.left = `${x + offsetX}px`;
+        cell.style.top = `${y + offsetY}px`;
+      });
     }
     update();
     resize();
-    new ResizeObserver(resize).observe(document.documentElement);
+    new ResizeObserver(resize).observe(calendar);
     // Se actualiza al cambiar el día (máximo 1 segundo después) y al reabrir.
     setInterval(update, 1000);
     document.addEventListener('visibilitychange', () => {
