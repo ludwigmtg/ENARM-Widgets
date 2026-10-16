@@ -49,7 +49,7 @@
     main {
       width: 100%;
       height: 100%;
-      padding: 16px 12px;
+      padding: 24px 12px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -95,6 +95,30 @@
       border-radius: 3px;
       pointer-events: none;
       animation: today-halo 2.8s ease-out infinite;
+    }
+
+    /* Último cuadro: día del examen. */
+    .day.exam {
+      box-shadow: inset 0 0 0 1.5px var(--outline);
+    }
+
+    .day.exam::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 28%;
+      height: 28%;
+      background: var(--outline);
+      border-radius: 1px;
+      transform: translate(-50%, -50%) rotate(45deg);
+      pointer-events: none;
+    }
+
+    /* Mantener el rombo visible al llegar o pasar el examen. */
+    .day.exam.today::before,
+    .day.exam.past::before {
+      background: var(--background);
     }
 
     @keyframes today-pulse {
@@ -151,23 +175,25 @@
     <div
       id="calendar"
       role="img"
-      aria-label="Calendario visual de preparación para el ENARM"
+      aria-label="Calendario visual de preparación para el ENARM; el último cuadro con rombo representa el día del examen"
     ></div>
   </main>
 
   <script>
     'use strict';
 
-    // Fecha estimada, editable. El día del examen queda excluido.
+    // Fecha estimada del examen, incluida como último cuadro.
     const TARGET_DATE = '2027-09-27';
     const TIME_ZONE = 'America/Monterrey';
     const DAYS = 365;
     const DAY_MS = 86400000;
 
-    // UTC se usa como índice de fechas civiles para evitar desfases.
+    // UTC se usa como índice de fechas civiles.
     const [year, month, day] = TARGET_DATE.split('-').map(Number);
     const targetDay = Date.UTC(year, month - 1, day) / DAY_MS;
-    const startDay = targetDay - DAYS;
+
+    // 365 cuadros, incluyendo el día del examen.
+    const startDay = targetDay - (DAYS - 1);
 
     const formatter = new Intl.DateTimeFormat('en-US', {
       timeZone: TIME_ZONE,
@@ -196,7 +222,7 @@
     const cells = Array.from({ length: DAYS }, (_, index) => {
       const cell = document.createElement('span');
 
-      cell.className = 'day';
+      cell.className = index === DAYS - 1 ? 'day exam' : 'day';
       cell.setAttribute('aria-hidden', 'true');
       cell.dataset.date = new Date((startDay + index) * DAY_MS)
         .toISOString()
@@ -236,11 +262,8 @@
       cells.forEach((cell, index) => {
         const date = startDay + index;
 
-        cell.className = date < today
-          ? 'day past'
-          : date === today
-            ? 'day today'
-            : 'day';
+        cell.classList.toggle('past', date < today);
+        cell.classList.toggle('today', date === today);
       });
     }
 
@@ -278,7 +301,7 @@
 
       if (width <= 0 || height <= 0) return;
 
-      // Buscar el mayor cuadrado que cabe en el ancho y alto disponibles.
+      // Buscar el mayor cuadrado que cabe en ambas dimensiones.
       let low = 0;
       let high = Math.min(width, height);
 
@@ -312,7 +335,6 @@
 
     new ResizeObserver(resize).observe(calendar);
 
-    // Detectar el cambio de día automáticamente.
     setInterval(update, 1000);
 
     document.addEventListener('visibilitychange', () => {
