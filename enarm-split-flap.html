@@ -20,7 +20,6 @@
       --ink: #37352f;
       --muted: #98958e;
       --accent: #c66b4e;
-
       --upper: #f5f4f1;
       --lower: #eeede9;
       --seam: rgba(55, 53, 47, 0.18);
@@ -39,7 +38,6 @@
         --ink: #deddd8;
         --muted: #96928b;
         --accent: #d88b68;
-
         --upper: #30302e;
         --lower: #282826;
         --seam: rgba(0, 0, 0, 0.55);
@@ -53,7 +51,6 @@
       --ink: #37352f;
       --muted: #98958e;
       --accent: #c66b4e;
-
       --upper: #f5f4f1;
       --lower: #eeede9;
       --seam: rgba(55, 53, 47, 0.18);
@@ -66,7 +63,6 @@
       --ink: #deddd8;
       --muted: #96928b;
       --accent: #d88b68;
-
       --upper: #30302e;
       --lower: #282826;
       --seam: rgba(0, 0, 0, 0.55);
@@ -83,6 +79,7 @@
       width: 100%;
       height: 100%;
       margin: 0;
+      padding: 0;
       overflow: hidden;
     }
 
@@ -101,17 +98,18 @@
 
     main {
       position: absolute;
-      inset: 24px 12px;
+      inset: 0 12px;
       display: grid;
-      place-items: center;
+      justify-items: center;
+      align-items: start;
     }
 
     .countdown {
       width: 300px;
-      height: 236px;
-      padding: 12px;
+      height: 204px;
+      padding: 0 12px;
       transform: scale(var(--scale, 1));
-      transform-origin: center;
+      transform-origin: top center;
     }
 
     .content {
@@ -256,7 +254,6 @@
       top: calc(var(--digit-height) * -0.5);
     }
 
-    /* Ranura central del mecanismo. */
     .digit::before {
       content: "";
       position: absolute;
@@ -269,7 +266,6 @@
       pointer-events: none;
     }
 
-    /* Dos pequeños ejes laterales. */
     .digit::after {
       content: "";
       position: absolute;
@@ -589,12 +585,12 @@
 
       const height = Math.max(
         1,
-        document.documentElement.clientHeight - 48
+        document.documentElement.clientHeight
       );
 
       const scale = Math.max(
         0.01,
-        Math.min(width / 300, height / 236, 1.35)
+        Math.min(width / 300, height / 204, 1.35)
       );
 
       document.querySelector(".countdown").style.setProperty(
