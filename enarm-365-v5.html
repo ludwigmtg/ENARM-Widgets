@@ -1,364 +1,209 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light dark">
-  <title>ENARM · 365 días</title>
-
-  <style>
-    :root {
-      --background: #ffffff;
-      --past: #66645f;
-      --past-alt: #807d75;
-      --future: #eeedea;
-      --future-alt: #e1e0dc;
-      --today: #c66b4e;
-      --outline: #b45c41;
-      --radius: 2px;
-
-      --exam: #b64f54;
-      --exam-duration: 6s;
-      --exam-opacity-min: 0.42;
-      --exam-opacity-max: 0.66;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --background: #191919;
-        --past: #b8b6b0;
-        --past-alt: #9b9993;
-        --future: #333332;
-        --future-alt: #3e3e3b;
-        --today: #d88b68;
-        --outline: #e2a081;
-
-        --exam: #d16b70;
-      }
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      overflow: hidden;
-    }
-
-    body {
-      background: var(--background);
-    }
-
-    main {
-      width: 100%;
-      height: 100%;
-      padding: 24px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #calendar {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-
-    .day {
-      position: absolute;
-      background: var(--future);
-      border-radius: var(--radius);
-    }
-
-    .day[data-month-tone="alternate"] {
-      background: var(--future-alt);
-    }
-
-    .day.past {
-      background: var(--past);
-    }
-
-    .day.past[data-month-tone="alternate"] {
-      background: var(--past-alt);
-    }
-
-    /* Día actual: terracota con latido y halo exterior. */
-    .day.today,
-    .day.today[data-month-tone="alternate"] {
-      background: var(--today);
-      box-shadow: inset 0 0 0 1px var(--outline);
-      z-index: 2;
-      animation: today-pulse 2.8s ease-in-out infinite;
-    }
-
-    .day.today::after {
-      content: "";
-      position: absolute;
-      inset: -1px;
-      border: 1px solid var(--today);
-      border-radius: 3px;
-      pointer-events: none;
-      animation: today-halo 2.8s ease-out infinite;
-    }
-
-    /* Examen: contorno rojo y relleno de respiración lenta. */
-    .day.exam:not(.today):not(.past) {
-      background: var(--background);
-      box-shadow: inset 0 0 0 1.5px var(--exam);
-      overflow: hidden;
-    }
-
-    .day.exam:not(.today):not(.past)::before {
-      content: "";
-      position: absolute;
-      inset: 2px;
-      border-radius: 1px;
-      background: var(--exam);
-      pointer-events: none;
-      animation: exam-breathe var(--exam-duration) ease-in-out infinite;
-    }
-
-    @keyframes exam-breathe {
-      0%,
-      100% {
-        opacity: var(--exam-opacity-min);
-      }
-
-      50% {
-        opacity: var(--exam-opacity-max);
-      }
-    }
-
-    @keyframes today-pulse {
-      0%,
-      100% {
-        filter: brightness(1);
-        transform: scale(1);
-      }
-
-      28% {
-        filter: brightness(1.22);
-        transform: scale(1.09);
-      }
-
-      65% {
-        filter: brightness(1);
-        transform: scale(1);
-      }
-    }
-
-    @keyframes today-halo {
-      0% {
-        opacity: 0;
-        transform: scale(1);
-      }
-
-      18% {
-        opacity: 0.65;
-        transform: scale(1.05);
-      }
-
-      78%,
-      100% {
-        opacity: 0;
-        transform: scale(1.75);
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .day.today,
-      .day.today::after,
-      .day.exam:not(.today):not(.past)::before {
-        animation: none;
-      }
-
-      .day.today::after {
-        display: none;
-      }
-
-      .day.exam:not(.today):not(.past)::before {
-        opacity: 0.54;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>ENARM · Frase diaria y calendario</title>
+<style>
+@font-face{font-family:EB Garamond;src:url('./EBGaramond-VariableFont_wght.ttf') format('truetype');font-style:normal;font-weight:400 800;font-display:swap}
+@font-face{font-family:EB Garamond;src:url('./EBGaramond-Italic-VariableFont_wght.ttf') format('truetype');font-style:italic;font-weight:400 800;font-display:swap}
+:root{--background:#fff;--ink:#37352f;--muted:#827e76;--past:#66645f;--past-alt:#807d75;--future:#eeedea;--future-alt:#e1e0dc;--today:#c66b4e;--outline:#b45c41;--exam:#b64f54;--radius:2px}
+@media(prefers-color-scheme:dark){:root{--background:#191919;--ink:#deddd8;--muted:#a5a199;--past:#b8b6b0;--past-alt:#9b9993;--future:#333332;--future-alt:#3e3e3b;--today:#d88b68;--outline:#e2a081;--exam:#d16b70}}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+body{background:var(--background);color:var(--ink)}
+main{width:100%;height:100%;padding:24px 12px;display:flex;flex-direction:column;gap:20px;min-height:0}
+.quote-panel{flex:none;align-self:center;width:100%;max-width:920px;text-align:center;padding:0 12px}
+.quote-panel[hidden]{display:none}
+blockquote{font-family:'EB Garamond',Garamond,Georgia,serif;font-style:italic;font-weight:400;font-size:26px;line-height:1.22;margin:0;text-wrap:pretty;overflow-wrap:break-word}
+cite{display:block;font-family:'EB Garamond',Garamond,Georgia,serif;font-style:normal;font-weight:400;font-size:16px;line-height:1.25;margin-top:9px;color:var(--muted);overflow-wrap:break-word}
+#calendar{flex:1;min-height:0;width:100%;position:relative}
+.day{position:absolute;background:var(--future);border-radius:var(--radius)}
+.day[data-month-tone="alternate"]{background:var(--future-alt)}
+.day.past{background:var(--past)}
+.day.past[data-month-tone="alternate"]{background:var(--past-alt)}
+.day.today,.day.today[data-month-tone="alternate"]{background:var(--today);box-shadow:inset 0 0 0 1px var(--outline);z-index:2;animation:today-pulse 2.8s ease-in-out infinite}
+.day.today::after{content:'';position:absolute;inset:-1px;border:1px solid var(--today);border-radius:3px;pointer-events:none;animation:today-halo 2.8s ease-out infinite}
+.day.exam:not(.today):not(.past){background:var(--background);box-shadow:inset 0 0 0 1.5px var(--exam);overflow:hidden}
+.day.exam:not(.today):not(.past)::before{content:'';position:absolute;inset:2px;border-radius:1px;background:var(--exam);pointer-events:none;animation:exam-breathe 6s ease-in-out infinite}
+@keyframes exam-breathe{0%,100%{opacity:.42}50%{opacity:.66}}
+@keyframes today-pulse{0%,100%{filter:brightness(1);transform:scale(1)}28%{filter:brightness(1.22);transform:scale(1.09)}65%{filter:brightness(1);transform:scale(1)}}
+@keyframes today-halo{0%{opacity:0;transform:scale(1)}18%{opacity:.65;transform:scale(1.05)}78%,100%{opacity:0;transform:scale(1.75)}}
+@media(prefers-reduced-motion:reduce){.day.today,.day.today::after,.day.exam:not(.today):not(.past)::before{animation:none}.day.today::after{display:none}.day.exam:not(.today):not(.past)::before{opacity:.54}}
+</style>
 </head>
-
 <body>
-  <main>
-    <div
-      id="calendar"
-      role="img"
-      aria-label="Calendario visual de preparación para el ENARM. El último cuadro rojo representa el día del examen."
-    ></div>
-  </main>
+<main>
+  <section class="quote-panel" aria-label="Frase del día" hidden>
+    <blockquote id="quote"></blockquote>
+    <cite id="author"></cite>
+  </section>
+  <div id="calendar" role="img" aria-label="365 días de preparación para el ENARM; el último cuadro rojo representa el examen"></div>
+</main>
+<script>
+'use strict';
+const TARGET_DATE='2027-09-27';
+const TIME_ZONE='America/Monterrey';
+const DAYS=365;
+const DAY_MS=86400000;
+const QUOTES_URL='./frases.md';
+// Conservar esta clave al actualizar el HTML para mantener el historial.
+const STORAGE_KEY='enarm-quotes-deck-v1';
+const formatter=new Intl.DateTimeFormat('en-US',{timeZone:TIME_ZONE,year:'numeric',month:'2-digit',day:'2-digit'});
+function civilDay(now=new Date()){
+ const p=Object.fromEntries(formatter.formatToParts(now).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));
+ return Date.UTC(+p.year,+p.month-1,+p.day)/DAY_MS;
+}
+const [year,month,day]=TARGET_DATE.split('-').map(Number);
+const targetDay=Date.UTC(year,month-1,day)/DAY_MS;
+const startDay=targetDay-DAYS+1;
+const calendar=document.getElementById('calendar');
+const panel=document.querySelector('.quote-panel');
+const quoteText=document.getElementById('quote');
+const authorText=document.getElementById('author');
+const fragment=document.createDocumentFragment();
+let monthIndex=0,previousMonth='';
+const cells=Array.from({length:DAYS},(_,i)=>{
+ const cell=document.createElement('span');
+ cell.className=i===DAYS-1?'day exam':'day';
+ cell.setAttribute('aria-hidden','true');
+ cell.dataset.date=new Date((startDay+i)*DAY_MS).toISOString().slice(0,10);
+ const month=cell.dataset.date.slice(0,7);
+ if(previousMonth&&previousMonth!==month)monthIndex++;
+ cell.dataset.monthTone=monthIndex%2?'alternate':'base';previousMonth=month;
+ fragment.appendChild(cell);return cell;
+});
+calendar.appendChild(fragment);
 
-  <script>
-    'use strict';
+// Lee exclusivamente texto y autor. No ejecuta HTML del Markdown.
+function parseQuotes(markdown){
+ const quotes=[],seen=new Set();
+ let lines=[];
+ for(const raw of markdown.split(/\r?\n/)){
+  const match=raw.match(/^\s*>\s?(.*)$/);
+  if(!match)continue;
+  const line=match[1].trim();
+  if(/^[—–]\s+/.test(line)){
+   let text=lines.join(' ').trim().replace(/^\*([\s\S]*)\*$/,'$1').trim();
+   const author=line.replace(/^[—–]\s+/,'').trim();
+   const id=JSON.stringify([text,author]);
+   if(text&&author&&!seen.has(id)){seen.add(id);quotes.push({id,text,author});}
+   lines=[];
+  }else if(line)lines.push(line);
+ }
+ return quotes;
+}
+let quotes=[],memoryState=null,lastRenderedDay=null;
+function readState(){
+ try{
+  const state=JSON.parse(localStorage.getItem(STORAGE_KEY));
+  if(state&&Array.isArray(state.seen)&&state.seen.every(id=>typeof id==='string')&&typeof state.currentId==='string'&&Number.isInteger(state.day))return state;
+ }catch(error){/* Algunos navegadores restringen almacenamiento en embeds. */}
+ return memoryState;
+}
+function saveState(state){
+ memoryState=state;
+ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(error){/* Mantener al menos el estado de la sesión. */}
+}
+function randomIndex(length){
+ // Selección uniforme sin sesgo por módulo.
+ const limit=Math.floor(4294967296/length)*length;
+ const buffer=new Uint32Array(1);
+ do{crypto.getRandomValues(buffer);}while(buffer[0]>=limit);
+ return buffer[0]%length;
+}
+function chooseQuote(today){
+ const state=readState();
+ const current=state&&quotes.find(q=>q.id===state.currentId);
+ if(current&&state.day===today)return current;
+ const active=new Set(quotes.map(q=>q.id));
+ let seen=state?state.seen.filter(id=>active.has(id)):[];
+ let candidates=quotes.filter(q=>!seen.includes(q.id));
+ if(!candidates.length){
+  seen=[];
+  candidates=quotes.length>1?quotes.filter(q=>q.id!==state?.currentId):quotes;
+ }
+ const selected=candidates[randomIndex(candidates.length)];
+ saveState({day:today,currentId:selected.id,seen:[...seen,selected.id]});
+ return selected;
+}
+function update(){
+ const today=civilDay();
+ if(lastRenderedDay===today)return;
+ cells.forEach((cell,i)=>{
+  cell.classList.toggle('past',startDay+i<today);
+  cell.classList.toggle('today',startDay+i===today);
+ });
+ if(quotes.length){
+  const quote=chooseQuote(today);
+  quoteText.textContent=quote.text;
+  authorText.textContent='— '+quote.author;
+  panel.hidden=false;
+ }
+ lastRenderedDay=today;layout();
+}
 
-    // Fecha estimada del examen, incluida como último cuadro.
-    const TARGET_DATE = '2027-09-27';
-    const TIME_ZONE = 'America/Monterrey';
-    const DAYS = 365;
-    const DAY_MS = 86400000;
-
-    // UTC se utiliza únicamente como índice de fechas civiles.
-    const [year, month, day] = TARGET_DATE.split('-').map(Number);
-    const targetDay = Date.UTC(year, month - 1, day) / DAY_MS;
-
-    // 365 cuadros: del 28/09/2026 al 27/09/2027.
-    const startDay = targetDay - (DAYS - 1);
-
-    const formatter = new Intl.DateTimeFormat('en-US', {
-      timeZone: TIME_ZONE,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
-
-    function civilDay(now) {
-      const parts = Object.fromEntries(
-        formatter.formatToParts(now)
-          .filter(part => part.type !== 'literal')
-          .map(part => [part.type, part.value])
-      );
-
-      return Date.UTC(
-        +parts.year,
-        +parts.month - 1,
-        +parts.day
-      ) / DAY_MS;
-    }
-
-    const calendar = document.getElementById('calendar');
-    const fragment = document.createDocumentFragment();
-
-    const cells = Array.from({ length: DAYS }, (_, index) => {
-      const cell = document.createElement('span');
-
-      cell.className = index === DAYS - 1 ? 'day exam' : 'day';
-      cell.setAttribute('aria-hidden', 'true');
-
-      cell.dataset.date = new Date((startDay + index) * DAY_MS)
-        .toISOString()
-        .slice(0, 10);
-
-      fragment.appendChild(cell);
-      return cell;
-    });
-
-    calendar.appendChild(fragment);
-
-    // Tonos alternos para distinguir los meses.
-    let monthIndex = 0;
-
-    cells.forEach((cell, index) => {
-      if (
-        index > 0 &&
-        cell.dataset.date.slice(0, 7) !==
-          cells[index - 1].dataset.date.slice(0, 7)
-      ) {
-        monthIndex++;
-      }
-
-      cell.dataset.monthTone = monthIndex % 2
-        ? 'alternate'
-        : 'base';
-    });
-
-    let lastDay;
-
-    function update() {
-      const today = civilDay(new Date());
-
-      if (today === lastDay) return;
-      lastDay = today;
-
-      cells.forEach((cell, index) => {
-        const date = startDay + index;
-
-        cell.classList.toggle('past', date < today);
-        cell.classList.toggle('today', date === today);
-      });
-    }
-
-    // Retícula uniforme, adaptable al ancho y al alto.
-    function arrange(size, width) {
-      const gap = size * 0.25;
-      let x = 0;
-      let y = 0;
-      let usedWidth = 0;
-      const positions = [];
-
-      for (let i = 0; i < DAYS; i++) {
-        let nextX = i === 0 ? 0 : x + gap;
-
-        if (nextX + size > width + 0.0001) {
-          nextX = 0;
-          y += size + gap;
-        }
-
-        positions.push([nextX, y]);
-        x = nextX + size;
-        usedWidth = Math.max(usedWidth, x);
-      }
-
-      return {
-        positions,
-        width: usedWidth,
-        height: y + size
-      };
-    }
-
-    function resize() {
-      const width = calendar.clientWidth;
-      const height = calendar.clientHeight;
-
-      if (width <= 0 || height <= 0) return;
-
-      let low = 0;
-      let high = Math.min(width, height);
-
-      for (let i = 0; i < 40; i++) {
-        const middle = (low + high) / 2;
-
-        if (arrange(middle, width).height <= height) {
-          low = middle;
-        } else {
-          high = middle;
-        }
-      }
-
-      const size = low;
-      const layout = arrange(size, width);
-      const offsetX = Math.max(0, (width - layout.width) / 2);
-      const offsetY = Math.max(0, (height - layout.height) / 2);
-
-      cells.forEach((cell, index) => {
-        const [x, y] = layout.positions[index];
-
-        cell.style.width = `${size}px`;
-        cell.style.height = `${size}px`;
-        cell.style.left = `${x + offsetX}px`;
-        cell.style.top = `${y + offsetY}px`;
-      });
-    }
-
-    update();
-    resize();
-
-    new ResizeObserver(resize).observe(calendar);
-
-    setInterval(update, 1000);
-
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) update();
-    });
-
-    window.addEventListener('pageshow', update);
-  </script>
+function arrange(size,width){
+ const gap=size*.25,columns=Math.max(1,Math.floor((width+gap+.00001)/(size+gap)));
+ const rows=Math.ceil(DAYS/columns);
+ return {columns,gap,width:Math.min(DAYS,columns)*size+(Math.min(DAYS,columns)-1)*gap,height:rows*size+(rows-1)*gap};
+}
+function layout(){
+ if(!panel.hidden){
+  // Ajustar el texto sin truncarlo y reservar espacio para los 365 cuadros.
+  const available=Math.max(0,document.querySelector('main').clientHeight-48);
+  const budget=Math.max(0,Math.min(180,available*.5));
+  const maximum=Math.min(30,Math.max(20,panel.clientWidth/32));
+  let low=10,high=maximum;
+  for(let i=0;i<12;i++){
+   const middle=(low+high)/2;
+   quoteText.style.fontSize=middle+'px';
+   authorText.style.fontSize=Math.max(11,middle*.65)+'px';
+   if(panel.getBoundingClientRect().height<=budget)low=middle;else high=middle;
+  }
+  quoteText.style.fontSize=low+'px';
+  authorText.style.fontSize=Math.max(11,low*.65)+'px';
+ }
+ const width=calendar.clientWidth,height=calendar.clientHeight;
+ if(width<=0||height<=0)return;
+ let low=0,high=Math.min(width,height);
+ for(let i=0;i<40;i++){
+  const mid=(low+high)/2;
+  if(arrange(mid,width).height<=height)low=mid;else high=mid;
+ }
+ const size=low,grid=arrange(size,width);
+ const offsetX=Math.max(0,(width-grid.width)/2),offsetY=Math.max(0,(height-grid.height)/2);
+ cells.forEach((cell,i)=>Object.assign(cell.style,{
+  width:size+'px',height:size+'px',
+  left:(offsetX+(i%grid.columns)*(size+grid.gap))+'px',
+  top:(offsetY+Math.floor(i/grid.columns)*(size+grid.gap))+'px'
+ }));
+}
+let frame;
+function requestLayout(){cancelAnimationFrame(frame);frame=requestAnimationFrame(layout);}
+new ResizeObserver(requestLayout).observe(document.documentElement);
+document.fonts.ready.then(requestLayout);
+update();
+async function loadQuotes(){
+ try{
+  const response=await fetch(QUOTES_URL,{cache:'no-cache'});
+  if(!response.ok)throw new Error('No se pudo cargar frases.md: '+response.status);
+  const parsed=parseQuotes(await response.text());
+  if(!parsed.length)throw new Error('No se encontraron frases con autor.');
+  quotes=parsed;lastRenderedDay=null;update();
+  document.fonts.ready.then(requestLayout);
+ }catch(error){console.error(error);}
+}
+loadQuotes();
+setInterval(()=>{
+ const changed=lastRenderedDay!==civilDay();
+ update();
+ if(changed)loadQuotes();
+},1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)update();});
+window.addEventListener('pageshow',update);
+window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY){lastRenderedDay=null;update();}});
+</script>
 </body>
 </html>
