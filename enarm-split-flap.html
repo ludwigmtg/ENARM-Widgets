@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <title>ENARM · Cuenta regresiva</title>
+  <title>ENARM · Split-flap countdown</title>
 
   <style>
     @font-face {
@@ -20,10 +20,17 @@
       --ink: #37352f;
       --muted: #98958e;
       --accent: #c66b4e;
-      --seam: rgba(55, 53, 47, 0.065);
-      --digit-height: 38px;
-      --digit-width: 25px;
-      --number-size: 29px;
+
+      --upper: #f5f4f1;
+      --lower: #eeede9;
+      --seam: rgba(55, 53, 47, 0.18);
+      --edge: rgba(55, 53, 47, 0.055);
+      --hinge: #d1cec6;
+
+      --digit-height: 40px;
+      --digit-width: 27px;
+      --number-size: 28px;
+      --corner: 3px;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -32,7 +39,12 @@
         --ink: #deddd8;
         --muted: #96928b;
         --accent: #d88b68;
-        --seam: rgba(222, 221, 216, 0.065);
+
+        --upper: #30302e;
+        --lower: #282826;
+        --seam: rgba(0, 0, 0, 0.55);
+        --edge: rgba(255, 255, 255, 0.04);
+        --hinge: #55534e;
       }
     }
 
@@ -41,7 +53,12 @@
       --ink: #37352f;
       --muted: #98958e;
       --accent: #c66b4e;
-      --seam: rgba(55, 53, 47, 0.065);
+
+      --upper: #f5f4f1;
+      --lower: #eeede9;
+      --seam: rgba(55, 53, 47, 0.18);
+      --edge: rgba(55, 53, 47, 0.055);
+      --hinge: #d1cec6;
     }
 
     :root[data-theme="dark"] {
@@ -49,7 +66,12 @@
       --ink: #deddd8;
       --muted: #96928b;
       --accent: #d88b68;
-      --seam: rgba(222, 221, 216, 0.065);
+
+      --upper: #30302e;
+      --lower: #282826;
+      --seam: rgba(0, 0, 0, 0.55);
+      --edge: rgba(255, 255, 255, 0.04);
+      --hinge: #55534e;
     }
 
     * {
@@ -85,15 +107,15 @@
     }
 
     .countdown {
-      width: 280px;
-      height: 224px;
+      width: 300px;
+      height: 236px;
       padding: 12px;
       transform: scale(var(--scale, 1));
       transform-origin: center;
     }
 
     .content {
-      animation: appear 550ms ease-out both;
+      animation: appear 500ms ease-out both;
     }
 
     .heading {
@@ -127,21 +149,26 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 6px;
     }
 
     .hero {
-      --digit-height: 90px;
+      --digit-height: 94px;
       --digit-width: 58px;
       --number-size: 94px;
-      gap: 4px;
+      --corner: 5px;
     }
 
     .digits {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 2px;
+      gap: 4px;
       font-variant-numeric: lining-nums tabular-nums;
+    }
+
+    .hero .digits {
+      gap: 6px;
     }
 
     .label {
@@ -164,12 +191,8 @@
       margin-top: 16px;
     }
 
-    .details .group {
-      gap: 6px;
-    }
-
-    .seconds .digits {
-      opacity: 0.62;
+    .seconds .glyph {
+      opacity: 0.7;
     }
 
     .digit {
@@ -180,6 +203,8 @@
       perspective: 500px;
       color: var(--ink);
       font-weight: 400;
+      border-radius: var(--corner);
+      background: var(--lower);
     }
 
     .hero .digit {
@@ -193,19 +218,24 @@
       right: 0;
       height: 50%;
       overflow: hidden;
-      background: var(--background);
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
     }
 
     .top {
       top: 0;
+      background: var(--upper);
+      border-radius: var(--corner) var(--corner) 0 0;
       transform-origin: center bottom;
+      box-shadow: inset 0 1px 0 var(--edge);
     }
 
     .bottom {
       top: 50%;
+      background: var(--lower);
+      border-radius: 0 0 var(--corner) var(--corner);
       transform-origin: center top;
+      box-shadow: inset 0 -1px 0 var(--edge);
     }
 
     .glyph {
@@ -226,45 +256,68 @@
       top: calc(var(--digit-height) * -0.5);
     }
 
-    .digit::after {
+    /* Ranura central del mecanismo. */
+    .digit::before {
       content: "";
       position: absolute;
       top: calc(50% - 0.5px);
-      left: 3px;
-      right: 3px;
+      left: 0;
+      right: 0;
       height: 1px;
       background: var(--seam);
       z-index: 5;
       pointer-events: none;
     }
 
+    /* Dos pequeños ejes laterales. */
+    .digit::after {
+      content: "";
+      position: absolute;
+      top: calc(50% - 2px);
+      left: -1px;
+      width: 2px;
+      height: 4px;
+      border-radius: 1px;
+      background: var(--hinge);
+      box-shadow:
+        calc(var(--digit-width) - 1px) 0 0 var(--hinge);
+      z-index: 6;
+      pointer-events: none;
+    }
+
     .outgoing {
       z-index: 3;
-      animation: fold-out 200ms cubic-bezier(0.4, 0, 0.8, 0.4) both;
+      animation:
+        fold-out 230ms cubic-bezier(0.4, 0, 0.85, 0.4) both;
     }
 
     .incoming {
       z-index: 4;
-      animation: fold-in 200ms 200ms cubic-bezier(0.2, 0.6, 0.4, 1) both;
+      animation:
+        fold-in 230ms 230ms cubic-bezier(0.15, 0.6, 0.35, 1) both;
     }
 
     @keyframes fold-out {
       from {
         transform: rotateX(0deg);
+        filter: brightness(1);
       }
 
       to {
         transform: rotateX(-90deg);
+        filter: brightness(0.8);
       }
     }
 
     @keyframes fold-in {
       from {
         transform: rotateX(90deg);
+        filter: brightness(0.8);
       }
 
       to {
         transform: rotateX(0deg);
+        filter: brightness(1);
       }
     }
 
@@ -290,7 +343,10 @@
 
 <body>
   <main>
-    <section class="countdown" aria-label="Cuenta regresiva para el ENARM">
+    <section
+      class="countdown"
+      aria-label="Cuenta regresiva para el ENARM"
+    >
       <div class="content">
         <header class="heading">
           <h1>ENARM <span id="year">2027</span></h1>
@@ -349,7 +405,6 @@
     const TARGET_DATE = "2027-09-27";
     const TIME_ZONE = "America/Monterrey";
 
-    // Tema automático; permite ?theme=light o ?theme=dark.
     const requestedTheme = new URLSearchParams(
       window.location.search
     ).get("theme");
@@ -391,7 +446,6 @@
     const [year, month, day] = TARGET_DATE.split("-").map(Number);
     const civilTarget = Date.UTC(year, month - 1, day);
 
-    // Convertir la medianoche de Monterrey a un instante preciso.
     let target = civilTarget;
 
     for (let i = 0; i < 4; i++) {
@@ -464,7 +518,7 @@
 
       card.timer = setTimeout(() => {
         settle(card, next);
-      }, 440);
+      }, 500);
     }
 
     function render(animate = true) {
@@ -489,6 +543,7 @@
 
           for (const digit of value) {
             const card = document.createElement("div");
+
             card.className = "digit";
             card.setAttribute("aria-hidden", "true");
 
@@ -508,6 +563,7 @@
         }
 
         group.value = value;
+
         group.element.setAttribute(
           "aria-label",
           `${Number(value)} ${group.label} restantes`
@@ -538,7 +594,7 @@
 
       const scale = Math.max(
         0.01,
-        Math.min(width / 280, height / 224, 1.35)
+        Math.min(width / 300, height / 236, 1.35)
       );
 
       document.querySelector(".countdown").style.setProperty(
@@ -547,13 +603,10 @@
       );
     }
 
-    let tickTimer;
-
     function tick() {
       render(!document.hidden);
 
-      // Sincronizar las actualizaciones con los segundos reales.
-      tickTimer = setTimeout(
+      setTimeout(
         tick,
         1000 - (Date.now() % 1000) + 5
       );
@@ -570,13 +623,10 @@
     document.fonts.ready.then(resize);
 
     document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) {
-        settleAll();
-      }
+      if (!document.hidden) settleAll();
     });
 
     window.addEventListener("pageshow", settleAll);
-
     reducedMotion.addEventListener("change", settleAll);
   </script>
 </body>
