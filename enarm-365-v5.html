@@ -10,23 +10,30 @@
     :root {
       --background: #ffffff;
       --past: #66645f;
+      --past-alt: #807d75;
       --future: #eeedea;
       --future-alt: #e1e0dc;
-      --past-alt: #807d75;
       --today: #c66b4e;
       --outline: #b45c41;
       --radius: 2px;
+
+      --exam: #b64f54;
+      --exam-duration: 6s;
+      --exam-opacity-min: 0.42;
+      --exam-opacity-max: 0.66;
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
         --background: #191919;
         --past: #b8b6b0;
+        --past-alt: #9b9993;
         --future: #333332;
         --future-alt: #3e3e3b;
-        --past-alt: #9b9993;
         --today: #d88b68;
         --outline: #e2a081;
+
+        --exam: #d16b70;
       }
     }
 
@@ -79,6 +86,7 @@
       background: var(--past-alt);
     }
 
+    /* Día actual: terracota con latido y halo exterior. */
     .day.today,
     .day.today[data-month-tone="alternate"] {
       background: var(--today);
@@ -97,28 +105,32 @@
       animation: today-halo 2.8s ease-out infinite;
     }
 
-    /* Último cuadro: día del examen. */
-    .day.exam {
-      box-shadow: inset 0 0 0 1.5px var(--outline);
+    /* Examen: contorno rojo y relleno de respiración lenta. */
+    .day.exam:not(.today):not(.past) {
+      background: var(--background);
+      box-shadow: inset 0 0 0 1.5px var(--exam);
+      overflow: hidden;
     }
 
-    .day.exam::before {
+    .day.exam:not(.today):not(.past)::before {
       content: "";
       position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 28%;
-      height: 28%;
-      background: var(--outline);
+      inset: 2px;
       border-radius: 1px;
-      transform: translate(-50%, -50%) rotate(45deg);
+      background: var(--exam);
       pointer-events: none;
+      animation: exam-breathe var(--exam-duration) ease-in-out infinite;
     }
 
-    /* Mantener el rombo visible al llegar o pasar el examen. */
-    .day.exam.today::before,
-    .day.exam.past::before {
-      background: var(--background);
+    @keyframes exam-breathe {
+      0%,
+      100% {
+        opacity: var(--exam-opacity-min);
+      }
+
+      50% {
+        opacity: var(--exam-opacity-max);
+      }
     }
 
     @keyframes today-pulse {
@@ -159,12 +171,17 @@
 
     @media (prefers-reduced-motion: reduce) {
       .day.today,
-      .day.today::after {
+      .day.today::after,
+      .day.exam:not(.today):not(.past)::before {
         animation: none;
       }
 
       .day.today::after {
         display: none;
+      }
+
+      .day.exam:not(.today):not(.past)::before {
+        opacity: 0.54;
       }
     }
   </style>
@@ -175,7 +192,7 @@
     <div
       id="calendar"
       role="img"
-      aria-label="Calendario visual de preparación para el ENARM; el último cuadro con rombo representa el día del examen"
+      aria-label="Calendario visual de preparación para el ENARM. El último cuadro rojo representa el día del examen."
     ></div>
   </main>
 
@@ -188,11 +205,11 @@
     const DAYS = 365;
     const DAY_MS = 86400000;
 
-    // UTC se usa como índice de fechas civiles.
+    // UTC se utiliza únicamente como índice de fechas civiles.
     const [year, month, day] = TARGET_DATE.split('-').map(Number);
     const targetDay = Date.UTC(year, month - 1, day) / DAY_MS;
 
-    // 365 cuadros, incluyendo el día del examen.
+    // 365 cuadros: del 28/09/2026 al 27/09/2027.
     const startDay = targetDay - (DAYS - 1);
 
     const formatter = new Intl.DateTimeFormat('en-US', {
@@ -224,6 +241,7 @@
 
       cell.className = index === DAYS - 1 ? 'day exam' : 'day';
       cell.setAttribute('aria-hidden', 'true');
+
       cell.dataset.date = new Date((startDay + index) * DAY_MS)
         .toISOString()
         .slice(0, 10);
@@ -234,7 +252,7 @@
 
     calendar.appendChild(fragment);
 
-    // Alternar suavemente el tono entre meses.
+    // Tonos alternos para distinguir los meses.
     let monthIndex = 0;
 
     cells.forEach((cell, index) => {
@@ -267,7 +285,7 @@
       });
     }
 
-    // Retícula uniforme, sin espacios adicionales entre meses.
+    // Retícula uniforme, adaptable al ancho y al alto.
     function arrange(size, width) {
       const gap = size * 0.25;
       let x = 0;
@@ -301,7 +319,6 @@
 
       if (width <= 0 || height <= 0) return;
 
-      // Buscar el mayor cuadrado que cabe en ambas dimensiones.
       let low = 0;
       let high = Math.min(width, height);
 
