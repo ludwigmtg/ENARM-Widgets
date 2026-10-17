@@ -1,80 +1,583 @@
 <!doctype html>
-<html lang="es" data-theme="auto">
+<html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ENARM · Cuenta regresiva</title>
-<style>
-:root{--outside:#fff;--upper:#f5f5f3;--lower:#f1f1ef;--ink:#37352f;--muted:#98958e;--line:rgba(55,53,47,.09);--h:42px;--half:21px}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--outside:#191919;--upper:#252525;--lower:#232323;--ink:#deddd9;--muted:#8f8e89;--line:rgba(0,0,0,.22)}}
-:root[data-theme="dark"]{--outside:#191919;--upper:#252525;--lower:#232323;--ink:#deddd9;--muted:#8f8e89;--line:rgba(0,0,0,.22)}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:var(--outside);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}main{position:absolute;inset:0;display:grid;place-items:center}
-.board{width:280px;height:228px;padding:12px 14px;transform:scale(var(--scale,1));color:var(--ink)}
-header{display:flex;justify-content:center;align-items:center;gap:6px;height:16px;margin-bottom:14px;color:var(--muted)}h1,header span{margin:0;font-size:10px;font-weight:500;letter-spacing:1.5px}
-#rows{display:grid;grid-template-columns:repeat(3,1fr);column-gap:12px;row-gap:18px}
-.row{display:flex;flex-direction:column-reverse;align-items:center;gap:7px;min-width:0}.row:first-child{grid-column:1 / -1;--h:76px;--half:38px;gap:8px}
-.label{font-size:8px;letter-spacing:1.1px;color:var(--muted);font-weight:400}.digits{display:flex;justify-content:center;gap:3px}
-.digit{width:30px;height:var(--h);position:relative;perspective:400px;color:var(--ink);font-family:inherit;font-weight:400;font-variant-numeric:tabular-nums}.row:first-child .digit{width:52px}.row:first-child .glyph{font-size:61px;font-weight:300}
-.half{position:absolute;left:0;right:0;height:var(--half);overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden}.top{top:0;background:var(--upper);border-radius:3px 3px 0 0;transform-origin:center bottom}.bottom{top:var(--half);background:var(--lower);border-radius:0 0 3px 3px;transform-origin:center top}.glyph{position:absolute;inset:0;height:var(--h);display:flex;align-items:center;justify-content:center;font-size:30px;line-height:1}.bottom .glyph{top:calc(-1 * var(--half))}.digit:after{content:'';position:absolute;top:calc(var(--half) - .5px);left:0;right:0;height:1px;background:var(--line);z-index:5;pointer-events:none}
-.old{z-index:3;animation:out 230ms cubic-bezier(.4,0,.8,.4) both}.new{z-index:4;animation:in 230ms 230ms cubic-bezier(.2,.6,.4,1) both}@keyframes out{from{transform:rotateX(0)}to{transform:rotateX(-90deg)}}@keyframes in{from{transform:rotateX(90deg)}to{transform:rotateX(0)}}@media(prefers-reduced-motion:reduce){.old,.new{animation:none}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>ENARM · Cuenta regresiva</title>
+
+  <style>
+    @font-face {
+      font-family: "EB Garamond";
+      src: url("./EBGaramond-VariableFont_wght.ttf") format("truetype");
+      font-style: normal;
+      font-weight: 400 800;
+      font-display: swap;
+    }
+
+    :root {
+      --background: #ffffff;
+      --ink: #37352f;
+      --muted: #98958e;
+      --accent: #c66b4e;
+      --seam: rgba(55, 53, 47, 0.065);
+      --digit-height: 38px;
+      --digit-width: 25px;
+      --number-size: 29px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --background: #191919;
+        --ink: #deddd8;
+        --muted: #96928b;
+        --accent: #d88b68;
+        --seam: rgba(222, 221, 216, 0.065);
+      }
+    }
+
+    :root[data-theme="light"] {
+      --background: #ffffff;
+      --ink: #37352f;
+      --muted: #98958e;
+      --accent: #c66b4e;
+      --seam: rgba(55, 53, 47, 0.065);
+    }
+
+    :root[data-theme="dark"] {
+      --background: #191919;
+      --ink: #deddd8;
+      --muted: #96928b;
+      --accent: #d88b68;
+      --seam: rgba(222, 221, 216, 0.065);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    body {
+      background: var(--background);
+      color: var(--ink);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Helvetica,
+        Arial,
+        sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+      position: absolute;
+      inset: 24px 12px;
+      display: grid;
+      place-items: center;
+    }
+
+    .countdown {
+      width: 280px;
+      height: 224px;
+      padding: 12px;
+      transform: scale(var(--scale, 1));
+      transform-origin: center;
+    }
+
+    .content {
+      animation: appear 550ms ease-out both;
+    }
+
+    .heading {
+      height: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin-bottom: 10px;
+      color: var(--muted);
+    }
+
+    .heading::before {
+      content: "";
+      width: 4px;
+      height: 4px;
+      flex: none;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 500;
+      letter-spacing: 1.6px;
+    }
+
+    .group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero {
+      --digit-height: 90px;
+      --digit-width: 58px;
+      --number-size: 94px;
+      gap: 4px;
+    }
+
+    .digits {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 8px;
+      line-height: 10px;
+      font-weight: 400;
+      letter-spacing: 1.15px;
+    }
+
+    .hero .label {
+      font-size: 9px;
+      letter-spacing: 1.5px;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .details .group {
+      gap: 6px;
+    }
+
+    .seconds .digits {
+      opacity: 0.62;
+    }
+
+    .digit {
+      position: relative;
+      flex: none;
+      width: var(--digit-width);
+      height: var(--digit-height);
+      perspective: 500px;
+      color: var(--ink);
+      font-weight: 400;
+    }
+
+    .hero .digit {
+      font-family: "EB Garamond", Garamond, Georgia, serif;
+      font-weight: 450;
+    }
+
+    .half {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 50%;
+      overflow: hidden;
+      background: var(--background);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .top {
+      top: 0;
+      transform-origin: center bottom;
+    }
+
+    .bottom {
+      top: 50%;
+      transform-origin: center top;
+    }
+
+    .glyph {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--digit-height);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--number-size);
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .bottom .glyph {
+      top: calc(var(--digit-height) * -0.5);
+    }
+
+    .digit::after {
+      content: "";
+      position: absolute;
+      top: calc(50% - 0.5px);
+      left: 3px;
+      right: 3px;
+      height: 1px;
+      background: var(--seam);
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .outgoing {
+      z-index: 3;
+      animation: fold-out 200ms cubic-bezier(0.4, 0, 0.8, 0.4) both;
+    }
+
+    .incoming {
+      z-index: 4;
+      animation: fold-in 200ms 200ms cubic-bezier(0.2, 0.6, 0.4, 1) both;
+    }
+
+    @keyframes fold-out {
+      from {
+        transform: rotateX(0deg);
+      }
+
+      to {
+        transform: rotateX(-90deg);
+      }
+    }
+
+    @keyframes fold-in {
+      from {
+        transform: rotateX(90deg);
+      }
+
+      to {
+        transform: rotateX(0deg);
+      }
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .content,
+      .outgoing,
+      .incoming {
+        animation: none;
+      }
+    }
+  </style>
 </head>
-<body><main><section class="board" aria-label="Cuenta regresiva para el ENARM"><header><h1>ENARM</h1><span id="year">2027</span></header><div id="rows"></div></section></main>
-<script>
-'use strict';
-// Fecha estimada. Cuenta regresiva hasta las 00:00 de Monterrey.
-const TARGET_DATE='2027-09-27';
-const TIME_ZONE='America/Monterrey';
-const theme=new URLSearchParams(location.search).get('theme');
-document.documentElement.dataset.theme=['light','dark'].includes(theme)?theme:'auto';
-const formatter=new Intl.DateTimeFormat('en-GB',{timeZone:TIME_ZONE,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'});
-function localParts(date){return Object.fromEntries(formatter.formatToParts(date).filter(p=>p.type!=='literal').map(p=>[p.type,Number(p.value)]))}
-function civilMilliseconds(p){return Date.UTC(p.year,p.month-1,p.day,p.hour||0,p.minute||0,p.second||0)}
-// Convertir la medianoche local a un instante sin depender de la zona del dispositivo.
-const [year,month,day]=TARGET_DATE.split('-').map(Number);
-const civilTarget=Date.UTC(year,month-1,day);
-let target=civilTarget;
-for(let i=0;i<4;i++)target+=civilTarget-civilMilliseconds(localParts(new Date(target)));
-document.getElementById('year').textContent=year;
-function remaining(now=Date.now()){
- const total=Math.max(0,Math.ceil((target-now)/1000));
- return [Math.floor(total/86400),Math.floor(total/3600)%24,Math.floor(total/60)%60,total%60];
-}
-const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-const rows=document.getElementById('rows');
-const groups=['DÍAS','HORAS','MINUTOS','SEGUNDOS'].map((label,index)=>{
- const row=document.createElement('div');row.className='row';
- const text=document.createElement('span');text.className='label';text.textContent=label;
- const digits=document.createElement('div');digits.className='digits';digits.setAttribute('role','img');
- row.append(text,digits);rows.appendChild(row);return {digits,index,label,value:''};
-});
-function half(position,value,extra=''){
- const part=document.createElement('div');part.className='half '+position+' '+extra;
- const glyph=document.createElement('span');glyph.className='glyph';glyph.textContent=value;part.appendChild(glyph);return part;
-}
-function settle(card,value){clearTimeout(card.timer);card.replaceChildren(half('top',value),half('bottom',value))}
-function render(animate=true){
- const values=remaining();
- groups.forEach(group=>{
-  const value=String(values[group.index]).padStart(group.index===0?3:2,'0');
-  if(value===group.value)return;
-  const old=group.value;
-  if(old.length!==value.length){
-   group.digits.replaceChildren();
-   for(const digit of value){const card=document.createElement('div');card.className='digit';card.setAttribute('aria-hidden','true');settle(card,digit);group.digits.appendChild(card)}
-  }else Array.from(group.digits.children).forEach((card,i)=>{
-   if(old[i]===value[i])return;
-   settle(card,value[i]);
-   if(animate&&!reduced.matches){
-    card.replaceChildren(half('top',value[i]),half('bottom',old[i]),half('top',old[i],'old'),half('bottom',value[i],'new'));
-    card.timer=setTimeout(()=>settle(card,value[i]),480);
-   }
-  });
-  group.value=value;group.digits.setAttribute('aria-label',Number(value)+' '+group.label.toLowerCase());
- });
-}
-function resize(){document.querySelector('.board').style.setProperty('--scale',Math.max(.01,Math.min((document.documentElement.clientWidth-12)/280,(document.documentElement.clientHeight-12)/228,1.15)))}
-function tick(){render(!document.hidden);setTimeout(tick,1000-Date.now()%1000+5)}
-render(false);resize();tick();new ResizeObserver(resize).observe(document.documentElement);
-function resume(){render(false);groups.forEach(g=>Array.from(g.digits.children).forEach((card,i)=>settle(card,g.value[i])))}
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)resume()});window.addEventListener('pageshow',resume);reduced.addEventListener('change',resume);
-</script></body></html>
+
+<body>
+  <main>
+    <section class="countdown" aria-label="Cuenta regresiva para el ENARM">
+      <div class="content">
+        <header class="heading">
+          <h1>ENARM <span id="year">2027</span></h1>
+        </header>
+
+        <div class="group hero">
+          <div
+            class="digits"
+            id="days"
+            role="img"
+            aria-label="Días restantes"
+          ></div>
+          <span class="label">DÍAS</span>
+        </div>
+
+        <div class="details">
+          <div class="group">
+            <div
+              class="digits"
+              id="hours"
+              role="img"
+              aria-label="Horas restantes"
+            ></div>
+            <span class="label">HORAS</span>
+          </div>
+
+          <div class="group">
+            <div
+              class="digits"
+              id="minutes"
+              role="img"
+              aria-label="Minutos restantes"
+            ></div>
+            <span class="label">MINUTOS</span>
+          </div>
+
+          <div class="group seconds">
+            <div
+              class="digits"
+              id="seconds"
+              role="img"
+              aria-label="Segundos restantes"
+            ></div>
+            <span class="label">SEGUNDOS</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    "use strict";
+
+    // Fecha estimada del examen.
+    // La cuenta termina a las 00:00 de Monterrey.
+    const TARGET_DATE = "2027-09-27";
+    const TIME_ZONE = "America/Monterrey";
+
+    // Tema automático; permite ?theme=light o ?theme=dark.
+    const requestedTheme = new URLSearchParams(
+      window.location.search
+    ).get("theme");
+
+    if (["light", "dark"].includes(requestedTheme)) {
+      document.documentElement.dataset.theme = requestedTheme;
+    }
+
+    const formatter = new Intl.DateTimeFormat("en-GB", {
+      timeZone: TIME_ZONE,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23"
+    });
+
+    function localParts(date) {
+      return Object.fromEntries(
+        formatter.formatToParts(date)
+          .filter(part => part.type !== "literal")
+          .map(part => [part.type, Number(part.value)])
+      );
+    }
+
+    function civilMilliseconds(parts) {
+      return Date.UTC(
+        parts.year,
+        parts.month - 1,
+        parts.day,
+        parts.hour || 0,
+        parts.minute || 0,
+        parts.second || 0
+      );
+    }
+
+    const [year, month, day] = TARGET_DATE.split("-").map(Number);
+    const civilTarget = Date.UTC(year, month - 1, day);
+
+    // Convertir la medianoche de Monterrey a un instante preciso.
+    let target = civilTarget;
+
+    for (let i = 0; i < 4; i++) {
+      target += civilTarget - civilMilliseconds(
+        localParts(new Date(target))
+      );
+    }
+
+    document.getElementById("year").textContent = year;
+
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
+    const groups = [
+      { id: "days", label: "días", length: 3 },
+      { id: "hours", label: "horas", length: 2 },
+      { id: "minutes", label: "minutos", length: 2 },
+      { id: "seconds", label: "segundos", length: 2 }
+    ].map(group => ({
+      ...group,
+      element: document.getElementById(group.id),
+      value: ""
+    }));
+
+    function remaining(now = Date.now()) {
+      const total = Math.max(
+        0,
+        Math.ceil((target - now) / 1000)
+      );
+
+      return [
+        Math.floor(total / 86400),
+        Math.floor(total / 3600) % 24,
+        Math.floor(total / 60) % 60,
+        total % 60
+      ];
+    }
+
+    function createHalf(position, value, extraClass = "") {
+      const half = document.createElement("div");
+      half.className = `half ${position} ${extraClass}`;
+
+      const glyph = document.createElement("span");
+      glyph.className = "glyph";
+      glyph.textContent = value;
+
+      half.appendChild(glyph);
+      return half;
+    }
+
+    function settle(card, value) {
+      clearTimeout(card.timer);
+
+      card.replaceChildren(
+        createHalf("top", value),
+        createHalf("bottom", value)
+      );
+    }
+
+    function animateDigit(card, previous, next) {
+      settle(card, next);
+
+      card.replaceChildren(
+        createHalf("top", next),
+        createHalf("bottom", previous),
+        createHalf("top", previous, "outgoing"),
+        createHalf("bottom", next, "incoming")
+      );
+
+      card.timer = setTimeout(() => {
+        settle(card, next);
+      }, 440);
+    }
+
+    function render(animate = true) {
+      const values = remaining();
+
+      groups.forEach((group, index) => {
+        const value = String(values[index]).padStart(
+          group.length,
+          "0"
+        );
+
+        if (value === group.value) return;
+
+        const previous = group.value;
+
+        if (previous.length !== value.length) {
+          for (const card of group.element.children) {
+            clearTimeout(card.timer);
+          }
+
+          group.element.replaceChildren();
+
+          for (const digit of value) {
+            const card = document.createElement("div");
+            card.className = "digit";
+            card.setAttribute("aria-hidden", "true");
+
+            settle(card, digit);
+            group.element.appendChild(card);
+          }
+        } else {
+          Array.from(group.element.children).forEach((card, i) => {
+            if (previous[i] === value[i]) return;
+
+            if (animate && !reducedMotion.matches) {
+              animateDigit(card, previous[i], value[i]);
+            } else {
+              settle(card, value[i]);
+            }
+          });
+        }
+
+        group.value = value;
+        group.element.setAttribute(
+          "aria-label",
+          `${Number(value)} ${group.label} restantes`
+        );
+      });
+    }
+
+    function settleAll() {
+      render(false);
+
+      groups.forEach(group => {
+        Array.from(group.element.children).forEach((card, index) => {
+          settle(card, group.value[index]);
+        });
+      });
+    }
+
+    function resize() {
+      const width = Math.max(
+        1,
+        document.documentElement.clientWidth - 24
+      );
+
+      const height = Math.max(
+        1,
+        document.documentElement.clientHeight - 48
+      );
+
+      const scale = Math.max(
+        0.01,
+        Math.min(width / 280, height / 224, 1.35)
+      );
+
+      document.querySelector(".countdown").style.setProperty(
+        "--scale",
+        scale
+      );
+    }
+
+    let tickTimer;
+
+    function tick() {
+      render(!document.hidden);
+
+      // Sincronizar las actualizaciones con los segundos reales.
+      tickTimer = setTimeout(
+        tick,
+        1000 - (Date.now() % 1000) + 5
+      );
+    }
+
+    render(false);
+    resize();
+    tick();
+
+    new ResizeObserver(resize).observe(
+      document.documentElement
+    );
+
+    document.fonts.ready.then(resize);
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        settleAll();
+      }
+    });
+
+    window.addEventListener("pageshow", settleAll);
+
+    reducedMotion.addEventListener("change", settleAll);
+  </script>
+</body>
+</html>
