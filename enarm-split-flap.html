@@ -26,16 +26,16 @@
       --edge: rgba(55, 53, 47, 0.055);
       --hinge: #d1cec6;
 
+      --unit: 58px;
+      --digit-gap: 4px;
+      --heading-font: 10px;
       --heading-height: 12px;
       --heading-gap: 10px;
-      --heading-font: 10px;
       --label-font: 8px;
-      --label-height: 11px;
+      --label-height: 10px;
       --label-gap: 6px;
-      --row-gap: 10px;
-      --column-gap: 12px;
-      --digit-gap: 4px;
-      --label-width: 42px;
+      --section-gap: 16px;
+      --row-gap: 7px;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -105,11 +105,14 @@
     main {
       position: absolute;
       inset: 0 4px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
     }
 
     .countdown {
       width: 100%;
-      height: 100%;
+      max-width: 400px;
       min-width: 0;
     }
 
@@ -141,63 +144,74 @@
       white-space: nowrap;
     }
 
-    .groups {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      column-gap: var(--column-gap);
-      row-gap: var(--row-gap);
-    }
-
     .group {
-      min-width: 0;
+      --digit-width: calc(var(--unit) * 0.44);
+      --digit-height: calc(var(--unit) * 0.65);
+      --number-size: calc(var(--unit) * 0.47);
+      --corner: 3px;
+
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: var(--label-gap);
+      min-width: 0;
     }
 
-    .days {
-      grid-column: 1 / -1;
+    .hero {
+      --digit-width: var(--unit);
+      --digit-height: calc(var(--unit) * 1.5);
+      --number-size: calc(var(--unit) * 1.5);
+      --corner: 5px;
     }
 
     .digits {
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       gap: var(--digit-gap);
-      flex: none;
       font-variant-numeric: lining-nums tabular-nums;
     }
 
     .label {
-      display: block;
       color: var(--muted);
       font-size: var(--label-font);
       line-height: var(--label-height);
       font-weight: 400;
-      letter-spacing: 0.8px;
+      letter-spacing: 1px;
       white-space: nowrap;
+    }
+
+    .hero .label {
+      letter-spacing: 1.5px;
+    }
+
+    .details {
+      width: min(100%, calc(var(--unit) * 4.4));
+      margin: var(--section-gap) auto 0;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 8px;
+    }
+
+    .seconds .glyph {
+      opacity: 0.7;
     }
 
     .digit {
       position: relative;
       flex: none;
-      width: var(--digit-width, 30px);
-      height: var(--digit-height, 44px);
+      width: var(--digit-width);
+      height: var(--digit-height);
       perspective: 600px;
       color: var(--ink);
       font-weight: 400;
-      border-radius: var(--corner, 3px);
+      border-radius: var(--corner);
       background: var(--lower);
     }
 
-    .days .digit {
+    .hero .digit {
       font-family: "EB Garamond", Garamond, Georgia, serif;
       font-weight: 450;
-    }
-
-    .seconds .glyph {
-      opacity: 0.7;
     }
 
     .half {
@@ -213,10 +227,7 @@
     .top {
       top: 0;
       background: var(--upper);
-      border-radius:
-        var(--corner, 3px)
-        var(--corner, 3px)
-        0 0;
+      border-radius: var(--corner) var(--corner) 0 0;
       transform-origin: center bottom;
       box-shadow: inset 0 1px 0 var(--edge);
     }
@@ -224,10 +235,7 @@
     .bottom {
       top: 50%;
       background: var(--lower);
-      border-radius:
-        0 0
-        var(--corner, 3px)
-        var(--corner, 3px);
+      border-radius: 0 0 var(--corner) var(--corner);
       transform-origin: center top;
       box-shadow: inset 0 -1px 0 var(--edge);
     }
@@ -237,17 +245,17 @@
       top: 0;
       left: 0;
       right: 0;
-      height: var(--digit-height, 44px);
+      height: var(--digit-height);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: var(--number-size, 32px);
+      font-size: var(--number-size);
       line-height: 1;
       white-space: nowrap;
     }
 
     .bottom .glyph {
-      top: calc(var(--digit-height, 44px) * -0.5);
+      top: calc(var(--digit-height) * -0.5);
     }
 
     .digit::before {
@@ -272,8 +280,7 @@
       border-radius: 1px;
       background: var(--hinge);
       box-shadow:
-        calc(var(--digit-width, 30px) - 1px)
-        0 0 var(--hinge);
+        calc(var(--digit-width) - 1px) 0 0 var(--hinge);
       z-index: 6;
       pointer-events: none;
     }
@@ -290,40 +297,23 @@
         fold-in 230ms 230ms cubic-bezier(0.15, 0.6, 0.35, 1) both;
     }
 
-    /* Dos columnas cuando el bloque tiene un ancho intermedio. */
-    :root[data-layout="compact"] .groups {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    :root[data-layout="compact"] .days {
-      grid-column: auto;
-    }
-
-    /* Cuatro filas cuando el bloque es estrecho. */
-    :root[data-layout="narrow"] .groups {
+    /* Los días permanecen grandes arriba.
+       Solo se reorganizan las unidades pequeñas. */
+    :root[data-layout="narrow"] .details {
+      width: min(100%, 190px);
       grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--row-gap);
     }
 
-    :root[data-layout="narrow"] .group {
-      display: grid;
-      grid-template-columns:
-        minmax(0, 1fr)
-        var(--label-width);
-      align-items: center;
-      column-gap: var(--column-gap);
+    :root[data-layout="narrow"] .details .group {
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 8px;
     }
 
-    :root[data-layout="narrow"] .days {
-      grid-column: auto;
-    }
-
-    :root[data-layout="narrow"] .digits {
-      justify-self: center;
-    }
-
-    :root[data-layout="narrow"] .label {
+    :root[data-layout="narrow"] .details .label {
       text-align: right;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
     }
 
     @keyframes fold-out {
@@ -369,17 +359,17 @@
         <h1>ENARM <span id="year">2027</span></h1>
       </header>
 
-      <div class="groups">
-        <div class="group days">
-          <div
-            class="digits"
-            id="days"
-            role="img"
-            aria-label="Días restantes"
-          ></div>
-          <span class="label">DÍAS</span>
-        </div>
+      <div class="group hero">
+        <div
+          class="digits"
+          id="days"
+          role="img"
+          aria-label="Días restantes"
+        ></div>
+        <span class="label">DÍAS</span>
+      </div>
 
+      <div class="details">
         <div class="group hours">
           <div
             class="digits"
@@ -421,6 +411,7 @@
 
     const root = document.documentElement;
     const main = document.querySelector("main");
+    const countdown = document.querySelector(".countdown");
 
     const requestedTheme = new URLSearchParams(
       window.location.search
@@ -485,7 +476,6 @@
     ].map(group => ({
       ...group,
       element: document.getElementById(group.id),
-      container: document.querySelector("." + group.id),
       value: ""
     }));
 
@@ -562,7 +552,6 @@
 
           for (const digit of value) {
             const card = document.createElement("div");
-
             card.className = "digit";
             card.setAttribute("aria-hidden", "true");
 
@@ -608,151 +597,84 @@
       return Math.min(maximum, Math.max(minimum, value));
     }
 
-    function setPixels(name, value) {
-      root.style.setProperty(name, value + "px");
-    }
-
     function resize() {
-      const width = main.clientWidth;
+      const width = countdown.clientWidth;
       const height = main.clientHeight;
 
       if (width <= 0 || height <= 0) return;
 
-      let layout;
+      const narrow = width < 220;
 
-      if (width >= 300) {
-        layout = "wide";
-      } else if (width >= 200) {
-        layout = "compact";
-      } else {
-        layout = "narrow";
+      root.dataset.layout = narrow ? "narrow" : "wide";
+
+      const headingFont = clamp(width * 0.035, 8, 11);
+      const headingHeight = headingFont * 1.2;
+      const headingGap = clamp(width * 0.035, 6, 10);
+
+      const labelFont = clamp(width * 0.026, 7, 9);
+      const labelHeight = labelFont * 1.3;
+      const labelGap = 5;
+      const sectionGap = narrow ? 12 : 16;
+      const rowGap = 7;
+
+      root.style.setProperty(
+        "--heading-font",
+        headingFont + "px"
+      );
+
+      root.style.setProperty(
+        "--heading-height",
+        headingHeight + "px"
+      );
+
+      root.style.setProperty(
+        "--heading-gap",
+        headingGap + "px"
+      );
+
+      root.style.setProperty("--label-font", labelFont + "px");
+      root.style.setProperty("--label-height", labelHeight + "px");
+      root.style.setProperty("--label-gap", labelGap + "px");
+      root.style.setProperty("--section-gap", sectionGap + "px");
+      root.style.setProperty("--row-gap", rowGap + "px");
+
+      // Buscar el mayor tamaño que cabe sin cambiar las proporciones.
+      let low = 1;
+      let high = 90;
+
+      for (let i = 0; i < 24; i++) {
+        const unit = (low + high) / 2;
+        const digitGap = Math.max(2, unit * 0.07);
+
+        root.style.setProperty("--unit", unit + "px");
+        root.style.setProperty("--digit-gap", digitGap + "px");
+
+        const heroWidth =
+          document.getElementById("days").scrollWidth;
+
+        const details = document.querySelector(".details");
+
+        const detailsFit = Array.from(
+          details.querySelectorAll(".group")
+        ).every(group => group.scrollWidth <= group.clientWidth + 0.5);
+
+        const fits =
+          heroWidth <= width - 2 &&
+          countdown.scrollHeight <= height + 0.5 &&
+          detailsFit;
+
+        if (fits) {
+          low = unit;
+        } else {
+          high = unit;
+        }
       }
 
-      root.dataset.layout = layout;
-
-      const headingFont = Math.min(
-        clamp(width * 0.045, 8, 12),
-        height * 0.07
+      root.style.setProperty("--unit", low + "px");
+      root.style.setProperty(
+        "--digit-gap",
+        Math.max(2, low * 0.07) + "px"
       );
-
-      const headingHeight = headingFont * 1.2;
-
-      const headingGap = Math.min(
-        clamp(width * 0.035, 5, 12),
-        height * 0.05
-      );
-
-      const labelFont = Math.min(
-        clamp(width * 0.035, 7, 10),
-        height * 0.045
-      );
-
-      const labelHeight = labelFont * 1.3;
-
-      const labelGap = Math.min(
-        clamp(width * 0.022, 4, 8),
-        height * 0.035
-      );
-
-      const rowGap = Math.min(
-        clamp(width * 0.035, 6, 16),
-        height * 0.045
-      );
-
-      const columnGap = clamp(width * 0.04, 6, 16);
-      const digitGap = clamp(width * 0.018, 2, 6);
-      const labelWidth = labelFont * 5.5;
-
-      setPixels("--heading-font", headingFont);
-      setPixels("--heading-height", headingHeight);
-      setPixels("--heading-gap", headingGap);
-      setPixels("--label-font", labelFont);
-      setPixels("--label-height", labelHeight);
-      setPixels("--label-gap", labelGap);
-      setPixels("--row-gap", rowGap);
-      setPixels("--column-gap", columnGap);
-      setPixels("--digit-gap", digitGap);
-      setPixels("--label-width", labelWidth);
-
-      const availableHeight = Math.max(
-        1,
-        height - headingHeight - headingGap
-      );
-
-      groups.forEach((group, index) => {
-        const count = group.element.children.length || group.length;
-
-        let cardHeight;
-        let digitsWidth;
-
-        if (layout === "narrow") {
-          cardHeight = Math.max(
-            1,
-            (availableHeight - rowGap * 3) / 4
-          );
-
-          digitsWidth = Math.max(
-            1,
-            width - labelWidth - columnGap
-          );
-        } else if (layout === "compact") {
-          cardHeight = Math.max(
-            1,
-            (
-              availableHeight -
-              rowGap -
-              2 * (labelHeight + labelGap)
-            ) / 2
-          );
-
-          const groupWidth = (width - columnGap) / 2;
-
-          digitsWidth = Math.min(
-            groupWidth,
-            count * cardHeight * 0.78 + (count - 1) * digitGap
-          );
-        } else {
-          const cardsHeight = Math.max(
-            2,
-            availableHeight -
-            rowGap -
-            2 * (labelHeight + labelGap)
-          );
-
-          cardHeight = index === 0
-            ? cardsHeight * 0.66
-            : cardsHeight * 0.34;
-
-          const groupWidth = index === 0
-            ? width
-            : (width - columnGap * 2) / 3;
-
-          digitsWidth = Math.min(
-            groupWidth,
-            count * cardHeight * 0.78 + (count - 1) * digitGap
-          );
-        }
-
-        const cardWidth = Math.max(
-          1,
-          (digitsWidth - digitGap * (count - 1)) / count
-        );
-
-        const fontSize = index === 0
-          ? Math.min(cardHeight * 0.98, cardWidth * 1.7)
-          : Math.min(cardHeight * 0.74, cardWidth * 1.5);
-
-        const style = group.container.style;
-
-        style.setProperty("--digit-height", cardHeight + "px");
-        style.setProperty("--digit-width", cardWidth + "px");
-        style.setProperty("--number-size", fontSize + "px");
-
-        style.setProperty(
-          "--corner",
-          clamp(cardHeight * 0.065, 2, 6) + "px"
-        );
-      });
     }
 
     let layoutFrame;
