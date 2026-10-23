@@ -26,10 +26,8 @@
       --edge: rgba(55, 53, 47, 0.055);
       --hinge: #d1cec6;
 
-      --digit-height: 40px;
-      --digit-width: 27px;
-      --number-size: 28px;
-      --corner: 3px;
+      --scale: 1;
+      --base-width: 300px;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -98,38 +96,35 @@
 
     main {
       position: absolute;
-      inset: 0 12px;
-      display: grid;
-      justify-items: center;
-      align-items: start;
+      inset: 0 4px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow: hidden;
     }
 
     .countdown {
-      width: 300px;
-      height: 204px;
-      padding: 0 12px;
-      transform: scale(var(--scale, 1));
-      transform-origin: top center;
-    }
-
-    .content {
-      animation: appear 500ms ease-out both;
+      width: min(
+        100%,
+        calc(var(--base-width) * var(--scale))
+      );
+      min-width: 0;
     }
 
     .heading {
-      height: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
-      margin-bottom: 10px;
+      gap: calc(7px * var(--scale));
+      height: calc(12px * var(--scale));
+      margin-bottom: calc(10px * var(--scale));
       color: var(--muted);
     }
 
     .heading::before {
       content: "";
-      width: 4px;
-      height: 4px;
+      width: calc(4px * var(--scale));
+      height: calc(4px * var(--scale));
       flex: none;
       border-radius: 50%;
       background: var(--accent);
@@ -137,56 +132,66 @@
 
     h1 {
       margin: 0;
-      font-size: 10px;
+      font-size: calc(10px * var(--scale));
       line-height: 1;
       font-weight: 500;
-      letter-spacing: 1.6px;
+      letter-spacing: calc(1.6px * var(--scale));
+      white-space: nowrap;
+    }
+
+    .groups {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: calc(12px * var(--scale));
+      row-gap: calc(16px * var(--scale));
     }
 
     .group {
+      --digit-height: calc(40px * var(--scale));
+      --digit-width: calc(27px * var(--scale));
+      --number-size: calc(28px * var(--scale));
+      --corner: calc(3px * var(--scale));
+
+      min-width: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: calc(6px * var(--scale));
     }
 
-    .hero {
-      --digit-height: 94px;
-      --digit-width: 58px;
-      --number-size: 94px;
-      --corner: 5px;
+    .days {
+      --digit-height: calc(94px * var(--scale));
+      --digit-width: calc(58px * var(--scale));
+      --number-size: calc(94px * var(--scale));
+      --corner: calc(5px * var(--scale));
+
+      grid-column: 1 / -1;
     }
 
     .digits {
       display: flex;
-      align-items: center;
       justify-content: center;
-      gap: 4px;
+      align-items: center;
+      gap: calc(4px * var(--scale));
       font-variant-numeric: lining-nums tabular-nums;
     }
 
-    .hero .digits {
-      gap: 6px;
+    .days .digits {
+      gap: calc(6px * var(--scale));
     }
 
     .label {
       color: var(--muted);
-      font-size: 8px;
-      line-height: 10px;
+      font-size: calc(8px * var(--scale));
+      line-height: calc(10px * var(--scale));
       font-weight: 400;
-      letter-spacing: 1.15px;
+      letter-spacing: calc(1.15px * var(--scale));
+      white-space: nowrap;
     }
 
-    .hero .label {
-      font-size: 9px;
-      letter-spacing: 1.5px;
-    }
-
-    .details {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 16px;
+    .days .label {
+      font-size: calc(9px * var(--scale));
+      letter-spacing: calc(1.5px * var(--scale));
     }
 
     .seconds .glyph {
@@ -205,7 +210,7 @@
       background: var(--lower);
     }
 
-    .hero .digit {
+    .days .digit {
       font-family: "EB Garamond", Garamond, Georgia, serif;
       font-weight: 450;
     }
@@ -254,6 +259,7 @@
       top: calc(var(--digit-height) * -0.5);
     }
 
+    /* Ranura central. */
     .digit::before {
       content: "";
       position: absolute;
@@ -266,6 +272,7 @@
       pointer-events: none;
     }
 
+    /* Ejes laterales. */
     .digit::after {
       content: "";
       position: absolute;
@@ -293,6 +300,76 @@
         fold-in 230ms 230ms cubic-bezier(0.15, 0.6, 0.35, 1) both;
     }
 
+    /* Espacio mediano: cuadrícula de 2 × 2. */
+    :root[data-layout="compact"] .groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: calc(12px * var(--scale));
+    }
+
+    :root[data-layout="compact"] .group {
+      --digit-height: calc(62px * var(--scale));
+      --digit-width: calc(35px * var(--scale));
+      --number-size: calc(43px * var(--scale));
+      --corner: calc(4px * var(--scale));
+
+      gap: calc(5px * var(--scale));
+    }
+
+    :root[data-layout="compact"] .days {
+      --digit-width: calc(29px * var(--scale));
+      --number-size: calc(56px * var(--scale));
+
+      grid-column: auto;
+    }
+
+    :root[data-layout="compact"] .days .digits {
+      gap: calc(3px * var(--scale));
+    }
+
+    :root[data-layout="compact"] .days .label {
+      font-size: calc(8px * var(--scale));
+      letter-spacing: calc(1.15px * var(--scale));
+    }
+
+    /* Espacio estrecho: una unidad por fila. */
+    :root[data-layout="narrow"] .groups {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: calc(8px * var(--scale));
+    }
+
+    :root[data-layout="narrow"] .group {
+      --digit-height: calc(36px * var(--scale));
+      --digit-width: calc(23px * var(--scale));
+      --number-size: calc(26px * var(--scale));
+      --corner: calc(3px * var(--scale));
+
+      flex-direction: row;
+      justify-content: space-between;
+      gap: calc(8px * var(--scale));
+    }
+
+    :root[data-layout="narrow"] .days {
+      --digit-width: calc(24px * var(--scale));
+      --number-size: calc(36px * var(--scale));
+
+      grid-column: auto;
+    }
+
+    :root[data-layout="narrow"] .digits {
+      gap: calc(3px * var(--scale));
+    }
+
+    :root[data-layout="narrow"] .label {
+      font-size: calc(7px * var(--scale));
+      letter-spacing: calc(0.7px * var(--scale));
+      text-align: right;
+    }
+
+    :root[data-layout="narrow"] h1 {
+      font-size: calc(9px * var(--scale));
+      letter-spacing: calc(1px * var(--scale));
+    }
+
     @keyframes fold-out {
       from {
         transform: rotateX(0deg);
@@ -317,18 +394,7 @@
       }
     }
 
-    @keyframes appear {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
-    }
-
     @media (prefers-reduced-motion: reduce) {
-      .content,
       .outgoing,
       .incoming {
         animation: none;
@@ -343,12 +409,12 @@
       class="countdown"
       aria-label="Cuenta regresiva para el ENARM"
     >
-      <div class="content">
-        <header class="heading">
-          <h1>ENARM <span id="year">2027</span></h1>
-        </header>
+      <header class="heading">
+        <h1>ENARM <span id="year">2027</span></h1>
+      </header>
 
-        <div class="group hero">
+      <div class="groups">
+        <div class="group days">
           <div
             class="digits"
             id="days"
@@ -358,36 +424,34 @@
           <span class="label">DÍAS</span>
         </div>
 
-        <div class="details">
-          <div class="group">
-            <div
-              class="digits"
-              id="hours"
-              role="img"
-              aria-label="Horas restantes"
-            ></div>
-            <span class="label">HORAS</span>
-          </div>
+        <div class="group hours">
+          <div
+            class="digits"
+            id="hours"
+            role="img"
+            aria-label="Horas restantes"
+          ></div>
+          <span class="label">HORAS</span>
+        </div>
 
-          <div class="group">
-            <div
-              class="digits"
-              id="minutes"
-              role="img"
-              aria-label="Minutos restantes"
-            ></div>
-            <span class="label">MINUTOS</span>
-          </div>
+        <div class="group minutes">
+          <div
+            class="digits"
+            id="minutes"
+            role="img"
+            aria-label="Minutos restantes"
+          ></div>
+          <span class="label">MINUTOS</span>
+        </div>
 
-          <div class="group seconds">
-            <div
-              class="digits"
-              id="seconds"
-              role="img"
-              aria-label="Segundos restantes"
-            ></div>
-            <span class="label">SEGUNDOS</span>
-          </div>
+        <div class="group seconds">
+          <div
+            class="digits"
+            id="seconds"
+            role="img"
+            aria-label="Segundos restantes"
+          ></div>
+          <span class="label">SEGUNDOS</span>
         </div>
       </div>
     </section>
@@ -401,12 +465,14 @@
     const TARGET_DATE = "2027-09-27";
     const TIME_ZONE = "America/Monterrey";
 
+    const root = document.documentElement;
+
     const requestedTheme = new URLSearchParams(
       window.location.search
     ).get("theme");
 
     if (["light", "dark"].includes(requestedTheme)) {
-      document.documentElement.dataset.theme = requestedTheme;
+      root.dataset.theme = requestedTheme;
     }
 
     const formatter = new Intl.DateTimeFormat("en-GB", {
@@ -578,25 +644,39 @@
     }
 
     function resize() {
-      const width = Math.max(
-        1,
-        document.documentElement.clientWidth - 24
-      );
+      const width = Math.max(1, root.clientWidth - 8);
+      const height = Math.max(1, root.clientHeight);
 
-      const height = Math.max(
-        1,
-        document.documentElement.clientHeight
-      );
+      let layout;
+      let baseWidth;
+      let baseHeight;
+
+      if (width >= 260) {
+        layout = "wide";
+        baseWidth = 300;
+        baseHeight = 204;
+      } else if (width >= 150) {
+        layout = "compact";
+        baseWidth = 220;
+        baseHeight = 190;
+      } else {
+        layout = "narrow";
+        baseWidth = 140;
+        baseHeight = 190;
+      }
 
       const scale = Math.max(
         0.01,
-        Math.min(width / 300, height / 204, 1.35)
+        Math.min(
+          width / baseWidth,
+          height / baseHeight,
+          1.35
+        )
       );
 
-      document.querySelector(".countdown").style.setProperty(
-        "--scale",
-        scale
-      );
+      root.dataset.layout = layout;
+      root.style.setProperty("--base-width", baseWidth + "px");
+      root.style.setProperty("--scale", scale);
     }
 
     function tick() {
@@ -608,13 +688,11 @@
       );
     }
 
-    render(false);
     resize();
+    render(false);
     tick();
 
-    new ResizeObserver(resize).observe(
-      document.documentElement
-    );
+    new ResizeObserver(resize).observe(root);
 
     document.fonts.ready.then(resize);
 
