@@ -26,8 +26,16 @@
       --edge: rgba(55, 53, 47, 0.055);
       --hinge: #d1cec6;
 
-      --scale: 1;
-      --base-width: 300px;
+      --heading-height: 12px;
+      --heading-gap: 10px;
+      --heading-font: 10px;
+      --label-font: 8px;
+      --label-height: 11px;
+      --label-gap: 6px;
+      --row-gap: 10px;
+      --column-gap: 12px;
+      --digit-gap: 4px;
+      --label-width: 42px;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -97,17 +105,11 @@
     main {
       position: absolute;
       inset: 0 4px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      overflow: hidden;
     }
 
     .countdown {
-      width: min(
-        100%,
-        calc(var(--base-width) * var(--scale))
-      );
+      width: 100%;
+      height: 100%;
       min-width: 0;
     }
 
@@ -115,16 +117,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: calc(7px * var(--scale));
-      height: calc(12px * var(--scale));
-      margin-bottom: calc(10px * var(--scale));
+      gap: 7px;
+      height: var(--heading-height);
+      margin-bottom: var(--heading-gap);
       color: var(--muted);
     }
 
     .heading::before {
       content: "";
-      width: calc(4px * var(--scale));
-      height: calc(4px * var(--scale));
+      width: 4px;
+      height: 4px;
       flex: none;
       border-radius: 50%;
       background: var(--accent);
@@ -132,87 +134,70 @@
 
     h1 {
       margin: 0;
-      font-size: calc(10px * var(--scale));
+      font-size: var(--heading-font);
       line-height: 1;
       font-weight: 500;
-      letter-spacing: calc(1.6px * var(--scale));
+      letter-spacing: 1.2px;
       white-space: nowrap;
     }
 
     .groups {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      column-gap: calc(12px * var(--scale));
-      row-gap: calc(16px * var(--scale));
+      column-gap: var(--column-gap);
+      row-gap: var(--row-gap);
     }
 
     .group {
-      --digit-height: calc(40px * var(--scale));
-      --digit-width: calc(27px * var(--scale));
-      --number-size: calc(28px * var(--scale));
-      --corner: calc(3px * var(--scale));
-
       min-width: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: calc(6px * var(--scale));
+      gap: var(--label-gap);
     }
 
     .days {
-      --digit-height: calc(94px * var(--scale));
-      --digit-width: calc(58px * var(--scale));
-      --number-size: calc(94px * var(--scale));
-      --corner: calc(5px * var(--scale));
-
       grid-column: 1 / -1;
     }
 
     .digits {
       display: flex;
-      justify-content: center;
       align-items: center;
-      gap: calc(4px * var(--scale));
+      justify-content: center;
+      gap: var(--digit-gap);
+      flex: none;
       font-variant-numeric: lining-nums tabular-nums;
     }
 
-    .days .digits {
-      gap: calc(6px * var(--scale));
-    }
-
     .label {
+      display: block;
       color: var(--muted);
-      font-size: calc(8px * var(--scale));
-      line-height: calc(10px * var(--scale));
+      font-size: var(--label-font);
+      line-height: var(--label-height);
       font-weight: 400;
-      letter-spacing: calc(1.15px * var(--scale));
+      letter-spacing: 0.8px;
       white-space: nowrap;
-    }
-
-    .days .label {
-      font-size: calc(9px * var(--scale));
-      letter-spacing: calc(1.5px * var(--scale));
-    }
-
-    .seconds .glyph {
-      opacity: 0.7;
     }
 
     .digit {
       position: relative;
       flex: none;
-      width: var(--digit-width);
-      height: var(--digit-height);
-      perspective: 500px;
+      width: var(--digit-width, 30px);
+      height: var(--digit-height, 44px);
+      perspective: 600px;
       color: var(--ink);
       font-weight: 400;
-      border-radius: var(--corner);
+      border-radius: var(--corner, 3px);
       background: var(--lower);
     }
 
     .days .digit {
       font-family: "EB Garamond", Garamond, Georgia, serif;
       font-weight: 450;
+    }
+
+    .seconds .glyph {
+      opacity: 0.7;
     }
 
     .half {
@@ -228,7 +213,10 @@
     .top {
       top: 0;
       background: var(--upper);
-      border-radius: var(--corner) var(--corner) 0 0;
+      border-radius:
+        var(--corner, 3px)
+        var(--corner, 3px)
+        0 0;
       transform-origin: center bottom;
       box-shadow: inset 0 1px 0 var(--edge);
     }
@@ -236,7 +224,10 @@
     .bottom {
       top: 50%;
       background: var(--lower);
-      border-radius: 0 0 var(--corner) var(--corner);
+      border-radius:
+        0 0
+        var(--corner, 3px)
+        var(--corner, 3px);
       transform-origin: center top;
       box-shadow: inset 0 -1px 0 var(--edge);
     }
@@ -246,20 +237,19 @@
       top: 0;
       left: 0;
       right: 0;
-      height: var(--digit-height);
+      height: var(--digit-height, 44px);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: var(--number-size);
+      font-size: var(--number-size, 32px);
       line-height: 1;
       white-space: nowrap;
     }
 
     .bottom .glyph {
-      top: calc(var(--digit-height) * -0.5);
+      top: calc(var(--digit-height, 44px) * -0.5);
     }
 
-    /* Ranura central. */
     .digit::before {
       content: "";
       position: absolute;
@@ -272,7 +262,6 @@
       pointer-events: none;
     }
 
-    /* Ejes laterales. */
     .digit::after {
       content: "";
       position: absolute;
@@ -283,7 +272,8 @@
       border-radius: 1px;
       background: var(--hinge);
       box-shadow:
-        calc(var(--digit-width) - 1px) 0 0 var(--hinge);
+        calc(var(--digit-width, 30px) - 1px)
+        0 0 var(--hinge);
       z-index: 6;
       pointer-events: none;
     }
@@ -300,74 +290,40 @@
         fold-in 230ms 230ms cubic-bezier(0.15, 0.6, 0.35, 1) both;
     }
 
-    /* Espacio mediano: cuadrícula de 2 × 2. */
+    /* Dos columnas cuando el bloque tiene un ancho intermedio. */
     :root[data-layout="compact"] .groups {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: calc(12px * var(--scale));
-    }
-
-    :root[data-layout="compact"] .group {
-      --digit-height: calc(62px * var(--scale));
-      --digit-width: calc(35px * var(--scale));
-      --number-size: calc(43px * var(--scale));
-      --corner: calc(4px * var(--scale));
-
-      gap: calc(5px * var(--scale));
     }
 
     :root[data-layout="compact"] .days {
-      --digit-width: calc(29px * var(--scale));
-      --number-size: calc(56px * var(--scale));
-
       grid-column: auto;
     }
 
-    :root[data-layout="compact"] .days .digits {
-      gap: calc(3px * var(--scale));
-    }
-
-    :root[data-layout="compact"] .days .label {
-      font-size: calc(8px * var(--scale));
-      letter-spacing: calc(1.15px * var(--scale));
-    }
-
-    /* Espacio estrecho: una unidad por fila. */
+    /* Cuatro filas cuando el bloque es estrecho. */
     :root[data-layout="narrow"] .groups {
       grid-template-columns: minmax(0, 1fr);
-      row-gap: calc(8px * var(--scale));
     }
 
     :root[data-layout="narrow"] .group {
-      --digit-height: calc(36px * var(--scale));
-      --digit-width: calc(23px * var(--scale));
-      --number-size: calc(26px * var(--scale));
-      --corner: calc(3px * var(--scale));
-
-      flex-direction: row;
-      justify-content: space-between;
-      gap: calc(8px * var(--scale));
+      display: grid;
+      grid-template-columns:
+        minmax(0, 1fr)
+        var(--label-width);
+      align-items: center;
+      column-gap: var(--column-gap);
     }
 
     :root[data-layout="narrow"] .days {
-      --digit-width: calc(24px * var(--scale));
-      --number-size: calc(36px * var(--scale));
-
       grid-column: auto;
     }
 
     :root[data-layout="narrow"] .digits {
-      gap: calc(3px * var(--scale));
+      justify-self: center;
     }
 
     :root[data-layout="narrow"] .label {
-      font-size: calc(7px * var(--scale));
-      letter-spacing: calc(0.7px * var(--scale));
       text-align: right;
-    }
-
-    :root[data-layout="narrow"] h1 {
-      font-size: calc(9px * var(--scale));
-      letter-spacing: calc(1px * var(--scale));
+      letter-spacing: 0.5px;
     }
 
     @keyframes fold-out {
@@ -460,12 +416,11 @@
   <script>
     "use strict";
 
-    // Fecha estimada del examen.
-    // La cuenta termina a las 00:00 de Monterrey.
     const TARGET_DATE = "2027-09-27";
     const TIME_ZONE = "America/Monterrey";
 
     const root = document.documentElement;
+    const main = document.querySelector("main");
 
     const requestedTheme = new URLSearchParams(
       window.location.search
@@ -530,6 +485,7 @@
     ].map(group => ({
       ...group,
       element: document.getElementById(group.id),
+      container: document.querySelector("." + group.id),
       value: ""
     }));
 
@@ -585,6 +541,7 @@
 
     function render(animate = true) {
       const values = remaining();
+      let needsLayout = false;
 
       groups.forEach((group, index) => {
         const value = String(values[index]).padStart(
@@ -612,6 +569,8 @@
             settle(card, digit);
             group.element.appendChild(card);
           }
+
+          needsLayout = true;
         } else {
           Array.from(group.element.children).forEach((card, i) => {
             if (previous[i] === value[i]) return;
@@ -631,6 +590,8 @@
           `${Number(value)} ${group.label} restantes`
         );
       });
+
+      if (needsLayout) requestLayout();
     }
 
     function settleAll() {
@@ -643,40 +604,162 @@
       });
     }
 
+    function clamp(value, minimum, maximum) {
+      return Math.min(maximum, Math.max(minimum, value));
+    }
+
+    function setPixels(name, value) {
+      root.style.setProperty(name, value + "px");
+    }
+
     function resize() {
-      const width = Math.max(1, root.clientWidth - 8);
-      const height = Math.max(1, root.clientHeight);
+      const width = main.clientWidth;
+      const height = main.clientHeight;
+
+      if (width <= 0 || height <= 0) return;
 
       let layout;
-      let baseWidth;
-      let baseHeight;
 
-      if (width >= 260) {
+      if (width >= 300) {
         layout = "wide";
-        baseWidth = 300;
-        baseHeight = 204;
-      } else if (width >= 150) {
+      } else if (width >= 200) {
         layout = "compact";
-        baseWidth = 220;
-        baseHeight = 190;
       } else {
         layout = "narrow";
-        baseWidth = 140;
-        baseHeight = 190;
       }
 
-      const scale = Math.max(
-        0.01,
-        Math.min(
-          width / baseWidth,
-          height / baseHeight,
-          1.35
-        )
+      root.dataset.layout = layout;
+
+      const headingFont = Math.min(
+        clamp(width * 0.045, 8, 12),
+        height * 0.07
       );
 
-      root.dataset.layout = layout;
-      root.style.setProperty("--base-width", baseWidth + "px");
-      root.style.setProperty("--scale", scale);
+      const headingHeight = headingFont * 1.2;
+
+      const headingGap = Math.min(
+        clamp(width * 0.035, 5, 12),
+        height * 0.05
+      );
+
+      const labelFont = Math.min(
+        clamp(width * 0.035, 7, 10),
+        height * 0.045
+      );
+
+      const labelHeight = labelFont * 1.3;
+
+      const labelGap = Math.min(
+        clamp(width * 0.022, 4, 8),
+        height * 0.035
+      );
+
+      const rowGap = Math.min(
+        clamp(width * 0.035, 6, 16),
+        height * 0.045
+      );
+
+      const columnGap = clamp(width * 0.04, 6, 16);
+      const digitGap = clamp(width * 0.018, 2, 6);
+      const labelWidth = labelFont * 5.5;
+
+      setPixels("--heading-font", headingFont);
+      setPixels("--heading-height", headingHeight);
+      setPixels("--heading-gap", headingGap);
+      setPixels("--label-font", labelFont);
+      setPixels("--label-height", labelHeight);
+      setPixels("--label-gap", labelGap);
+      setPixels("--row-gap", rowGap);
+      setPixels("--column-gap", columnGap);
+      setPixels("--digit-gap", digitGap);
+      setPixels("--label-width", labelWidth);
+
+      const availableHeight = Math.max(
+        1,
+        height - headingHeight - headingGap
+      );
+
+      groups.forEach((group, index) => {
+        const count = group.element.children.length || group.length;
+
+        let cardHeight;
+        let digitsWidth;
+
+        if (layout === "narrow") {
+          cardHeight = Math.max(
+            1,
+            (availableHeight - rowGap * 3) / 4
+          );
+
+          digitsWidth = Math.max(
+            1,
+            width - labelWidth - columnGap
+          );
+        } else if (layout === "compact") {
+          cardHeight = Math.max(
+            1,
+            (
+              availableHeight -
+              rowGap -
+              2 * (labelHeight + labelGap)
+            ) / 2
+          );
+
+          const groupWidth = (width - columnGap) / 2;
+
+          digitsWidth = Math.min(
+            groupWidth,
+            count * cardHeight * 0.78 + (count - 1) * digitGap
+          );
+        } else {
+          const cardsHeight = Math.max(
+            2,
+            availableHeight -
+            rowGap -
+            2 * (labelHeight + labelGap)
+          );
+
+          cardHeight = index === 0
+            ? cardsHeight * 0.66
+            : cardsHeight * 0.34;
+
+          const groupWidth = index === 0
+            ? width
+            : (width - columnGap * 2) / 3;
+
+          digitsWidth = Math.min(
+            groupWidth,
+            count * cardHeight * 0.78 + (count - 1) * digitGap
+          );
+        }
+
+        const cardWidth = Math.max(
+          1,
+          (digitsWidth - digitGap * (count - 1)) / count
+        );
+
+        const fontSize = index === 0
+          ? Math.min(cardHeight * 0.98, cardWidth * 1.7)
+          : Math.min(cardHeight * 0.74, cardWidth * 1.5);
+
+        const style = group.container.style;
+
+        style.setProperty("--digit-height", cardHeight + "px");
+        style.setProperty("--digit-width", cardWidth + "px");
+        style.setProperty("--number-size", fontSize + "px");
+
+        style.setProperty(
+          "--corner",
+          clamp(cardHeight * 0.065, 2, 6) + "px"
+        );
+      });
+    }
+
+    let layoutFrame;
+
+    function requestLayout() {
+      cancelAnimationFrame(layoutFrame);
+      layoutFrame = requestAnimationFrame(resize);
     }
 
     function tick() {
@@ -688,19 +771,26 @@
       );
     }
 
-    resize();
     render(false);
+    resize();
     tick();
 
-    new ResizeObserver(resize).observe(root);
+    new ResizeObserver(requestLayout).observe(main);
 
-    document.fonts.ready.then(resize);
+    document.fonts.ready.then(requestLayout);
 
     document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) settleAll();
+      if (!document.hidden) {
+        settleAll();
+        requestLayout();
+      }
     });
 
-    window.addEventListener("pageshow", settleAll);
+    window.addEventListener("pageshow", () => {
+      settleAll();
+      requestLayout();
+    });
+
     reducedMotion.addEventListener("change", settleAll);
   </script>
 </body>
