@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Pomodoro · Estudio</title>
+
+<style>
+@font-face {
+  font-family: "EB Garamond";
+  src: url("./EBGaramond-VariableFont_wght.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+}
+
+:root {
+  --bg: #ffffff;
+  --ink: #141413;
+  --muted: #928f85;
+  --upper: #f5f4f1;
+  --lower: #eeede9;
+  --line: rgba(20,20,19,.16);
+  --hinge: #d1cec6;
+  --accent: #d97757;
+  --wash: rgba(217,119,87,.1);
+  --unit: 48px;
+  --gap: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #191919;
+    --ink: #faf9f5;
+    --muted: #b0aea5;
+    --upper: #30302e;
+    --lower: #282826;
+    --line: rgba(0,0,0,.55);
+    --hinge: #55534e;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #191919;
+  --ink: #faf9f5;
+  --muted: #b0aea5;
+  --upper: #30302e;
+  --lower: #282826;
+  --line: rgba(0,0,0,.55);
+  --hinge: #55534e;
+}
+
+:root[data-phase="short"],
+:root[data-phase="long"] {
+  --accent: #788c5d;
+  --wash: rgba(120,140,93,.12);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family:
+    Poppins, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  position: absolute;
+  inset: 0 4px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.widget {
+  width: 100%;
+  max-width: 400px;
+  min-width: 0;
+}
+
+.heading {
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.heading::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+h1 {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  line-height: 1;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.modes {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 3px;
+  margin-bottom: 14px;
+}
+
+.mode {
+  min-width: 0;
+  min-height: 30px;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.mode[aria-pressed="true"] {
+  color: var(--accent);
+  background: var(--wash);
+}
+
+.mode:hover { background: var(--lower); }
+
+.timer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: calc(var(--unit) * .16);
+}
+
+.time-group {
+  --card-w: var(--unit);
+  --card-h: calc(var(--unit) * 1.5);
+  --font: calc(var(--unit) * 1.43);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.digits {
+  display: flex;
+  gap: var(--gap);
+  font-family: "EB Garamond", Garamond, Georgia, serif;
+  font-weight: 450;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.label {
+  font-size: 8px;
+  line-height: 11px;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.colon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(var(--unit) * 1.5);
+  width: calc(var(--unit) * .22);
+  font-family: "EB Garamond", Garamond, Georgia, serif;
+  font-size: calc(var(--unit) * .9);
+  color: var(--muted);
+  flex: none;
+}
+
+.digit {
+  width: var(--card-w);
+  height: var(--card-h);
+  position: relative;
+  perspective: 500px;
+  border-radius: 4px;
+  background: var(--lower);
+  flex: none;
+}
+
+.half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.top {
+  top: 0;
+  background: var(--upper);
+  border-radius: 4px 4px 0 0;
+  transform-origin: center bottom;
+}
+
+.bottom {
+  top: 50%;
+  background: var(--lower);
+  border-radius: 0 0 4px 4px;
+  transform-origin: center top;
+}
+
+.glyph {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--card-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font);
+  line-height: 1;
+}
+
+.bottom .glyph {
+  top: calc(var(--card-h) * -.5);
+}
+
+.digit::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% - .5px);
+  height: 1px;
+  background: var(--line);
+  z-index: 5;
+}
+
+.digit::after {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: calc(50% - 2px);
+  width: 2px;
+  height: 4px;
+  border-radius: 1px;
+  background: var(--hinge);
+  box-shadow: calc(var(--card-w) - 1px) 0 0 var(--hinge);
+  z-index: 6;
+}
+
+.outgoing {
+  z-index: 3;
+  animation: fold-out 210ms ease-in both;
+}
+
+.incoming {
+  z-index: 4;
+  animation: fold-in 210ms 210ms ease-out both;
+}
+
+.cycle {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin: 13px 0;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--hinge);
+}
+
+.dot.done { background: var(--accent); }
+
+.controls {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 34px 34px;
+  gap: 7px;
+  width: min(100%,232px);
+  margin: auto;
+}
+
+.start {
+  min-height: 34px;
+  border: 0;
+  border-radius: 5px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  border: 1px solid var(--lower);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted);
+}
+
+.icon:hover { background: var(--lower); }
+
+.icon svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.status {
+  min-height: 28px;
+  font-size: 10px;
+  line-height: 14px;
+  text-align: center;
+  color: var(--muted);
+  margin: 9px 0 0;
+  text-wrap: pretty;
+}
+
+:root[data-layout="narrow"] .timer {
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+:root[data-layout="narrow"] .colon { display: none; }
+
+:root[data-layout="narrow"] .seconds {
+  --card-w: calc(var(--unit) * .60);
+  --card-h: calc(var(--unit) * .90);
+  --font: calc(var(--unit) * .86);
+}
+
+:root[data-layout="narrow"] .seconds .glyph { opacity: .75; }
+
+@media (max-width: 155px) {
+  .controls {
+    grid-template-columns: 34px 34px;
+    justify-content: center;
+  }
+
+  .start {
+    grid-column: 1 / -1;
+    min-width: 100px;
+  }
+
+  .mode { font-size: 9px; }
+  .heading { margin-bottom: 8px; }
+  .modes { margin-bottom: 10px; }
+}
+
+@keyframes fold-out {
+  from { transform: rotateX(0); filter: brightness(1); }
+  to { transform: rotateX(-90deg); filter: brightness(.82); }
+}
+
+@keyframes fold-in {
+  from { transform: rotateX(90deg); filter: brightness(.82); }
+  to { transform: rotateX(0); filter: brightness(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .incoming, .outgoing { animation: none; }
+}
+</style>
+</head>
+
+<body>
+<main>
+  <section class="widget" aria-label="Temporizador Pomodoro">
+    <header class="heading">
+      <h1>POMODORO</h1>
+    </header>
+
+    <nav class="modes" aria-label="Etapa del temporizador">
+      <button
+        type="button"
+        class="mode"
+        data-mode="focus"
+        aria-pressed="true"
+      >Enfoque</button>
+
+      <button
+        type="button"
+        class="mode"
+        data-mode="short"
+        aria-pressed="false"
+      >Pausa</button>
+
+      <button
+        type="button"
+        class="mode"
+        data-mode="long"
+        aria-pressed="false"
+        aria-label="Pausa larga"
+      >Larga</button>
+    </nav>
+
+    <div
+      class="timer"
+      role="img"
+      aria-label="25 minutos restantes"
+      id="timer"
+    >
+      <div class="time-group minutes">
+        <div class="digits" id="minutes" aria-hidden="true"></div>
+        <span class="label">MINUTOS</span>
+      </div>
+
+      <span class="colon" aria-hidden="true">:</span>
+
+      <div class="time-group seconds">
+        <div class="digits" id="seconds" aria-hidden="true"></div>
+        <span class="label">SEGUNDOS</span>
+      </div>
+    </div>
+
+    <div
+      class="cycle"
+      role="img"
+      aria-label="0 de 4 sesiones completadas"
+    >
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+
+    <div class="controls">
+      <button type="button" class="start" id="start">Iniciar</button>
+
+      <button
+        type="button"
+        class="icon"
+        id="reset"
+        aria-label="Reiniciar etapa actual"
+        title="Reiniciar etapa"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/>
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        class="icon"
+        id="sound"
+        aria-label="Silenciar aviso sonoro"
+        aria-pressed="true"
+      ></button>
+    </div>
+
+    <p class="status" id="status" role="status" aria-live="polite">
+      Listo para concentrarte.
+    </p>
+  </section>
+</main>
+
+<script>
+"use strict";
+
+// Duraciones en minutos.
+const DURATIONS = { focus: 25, short: 5, long: 15 };
+const SESSIONS_PER_CYCLE = 4;
+const STORAGE_KEY = "enarm-pomodoro-v1";
+
+const root = document.documentElement;
+const widget = document.querySelector(".widget");
+const frame = document.querySelector("main");
+const startButton = document.getElementById("start");
+const soundButton = document.getElementById("sound");
+const statusText = document.getElementById("status");
+const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+
+const theme = new URLSearchParams(location.search).get("theme");
+
+if (["light", "dark"].includes(theme)) {
+  root.dataset.theme = theme;
+}
+
+const duration = phase => DURATIONS[phase] * 60000;
+
+function freshState() {
+  return {
+    version: 1,
+    phase: "focus",
+    remainingMs: duration("focus"),
+    deadline: null,
+    completed: 0,
+    sound: true,
+    notice: "Listo para concentrarte."
+  };
+}
+
+function valid(s) {
+  return s &&
+    s.version === 1 &&
+    Object.hasOwn(DURATIONS, s.phase) &&
+    Number.isFinite(s.remainingMs) &&
+    s.remainingMs >= 0 &&
+    s.remainingMs <= duration(s.phase) &&
+    (s.deadline === null || Number.isFinite(s.deadline)) &&
+    Number.isInteger(s.completed) &&
+    s.completed >= 0 &&
+    typeof s.sound === "boolean" &&
+    typeof s.notice === "string";
+}
+
+let state = freshState();
+
+try {
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  if (valid(saved)) state = saved;
+} catch (error) {
+  // El temporizador funciona aunque el embed bloquee el almacenamiento.
+}
+
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {}
+}
+
+function remainingMs(now = Date.now()) {
+  return Math.max(
+    0,
+    state.deadline === null
+      ? state.remainingMs
+      : state.deadline - now
+  );
+}
+
+let audioContext;
+
+function unlockAudio() {
+  if (!state.sound) return;
+
+  try {
+    const Audio = window.AudioContext || window.webkitAudioContext;
+    if (!Audio) return;
+
+    audioContext = audioContext || new Audio();
+
+    if (audioContext.state === "suspended") {
+      audioContext.resume().catch(() => {});
+    }
+  } catch (error) {}
+}
+
+function chime() {
+  if (
+    !state.sound ||
+    !audioContext ||
+    audioContext.state !== "running"
+  ) return;
+
+  for (let i = 0; i < 3; i++) {
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    const at = audioContext.currentTime + i * .28;
+
+    oscillator.type = "sine";
+    oscillator.frequency.value = i === 2 ? 784 : 660;
+
+    gain.gain.setValueAtTime(0, at);
+    gain.gain.linearRampToValueAtTime(.12, at + .015);
+    gain.gain.exponentialRampToValueAtTime(.001, at + .2);
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start(at);
+    oscillator.stop(at + .22);
+  }
+}
+
+function completeIfDue(now = Date.now(), notify = true) {
+  if (state.deadline === null || now < state.deadline) return false;
+
+  if (state.phase === "focus") {
+    state.completed++;
+
+    state.phase = state.completed % SESSIONS_PER_CYCLE === 0
+      ? "long"
+      : "short";
+
+    state.notice = state.phase === "long"
+      ? "Cuatro sesiones completas. Pausa larga lista."
+      : "Enfoque completado. Tu pausa está lista.";
+  } else {
+    state.phase = "focus";
+    state.notice = "Pausa terminada. Enfoque listo.";
+  }
+
+  state.deadline = null;
+  state.remainingMs = duration(state.phase);
+
+  save();
+  if (notify) chime();
+
+  return true;
+}
+
+const displays = [
+  { element: document.getElementById("minutes"), value: "" },
+  { element: document.getElementById("seconds"), value: "" }
+];
+
+function half(position, value, extra = "") {
+  const part = document.createElement("div");
+  part.className = `half ${position} ${extra}`;
+
+  const glyph = document.createElement("span");
+  glyph.className = "glyph";
+  glyph.textContent = value;
+
+  part.appendChild(glyph);
+  return part;
+}
+
+function settle(card, value) {
+  clearTimeout(card.timer);
+
+  card.replaceChildren(
+    half("top", value),
+    half("bottom", value)
+  );
+}
+
+function renderDigits(animate = true) {
+  const seconds = Math.ceil(remainingMs() / 1000);
+
+  const values = [
+    String(Math.floor(seconds / 60)).padStart(2, "0"),
+    String(seconds % 60).padStart(2, "0")
+  ];
+
+  displays.forEach((display, index) => {
+    const value = values[index];
+    const previous = display.value;
+
+    if (value === previous) return;
+
+    if (value.length !== previous.length) {
+      Array.from(display.element.children).forEach(card => {
+        clearTimeout(card.timer);
+      });
+
+      display.element.replaceChildren();
+
+      for (const digit of value) {
+        const card = document.createElement("div");
+        card.className = "digit";
+        settle(card, digit);
+        display.element.appendChild(card);
+      }
+    } else {
+      Array.from(display.element.children).forEach((card, i) => {
+        if (previous[i] === value[i]) return;
+
+        settle(card, value[i]);
+
+        if (animate && !reduced.matches) {
+          card.replaceChildren(
+            half("top", value[i]),
+            half("bottom", previous[i]),
+            half("top", previous[i], "outgoing"),
+            half("bottom", value[i], "incoming")
+          );
+
+          card.timer = setTimeout(() => {
+            settle(card, value[i]);
+          }, 460);
+        }
+      });
+    }
+
+    display.value = value;
+  });
+
+  document.getElementById("timer").setAttribute(
+    "aria-label",
+    `${Number(values[0])} minutos y ${Number(values[1])} segundos restantes`
+  );
+
+  document.title = values.join(":") + " · " +
+    (state.phase === "focus" ? "Enfoque" : "Pausa");
+}
+
+function renderUI() {
+  root.dataset.phase = state.phase;
+
+  document.querySelectorAll(".mode").forEach(button => {
+    button.setAttribute(
+      "aria-pressed",
+      String(button.dataset.mode === state.phase)
+    );
+  });
+
+  startButton.textContent = state.deadline !== null
+    ? "Pausar"
+    : state.remainingMs < duration(state.phase)
+      ? "Continuar"
+      : "Iniciar";
+
+  statusText.textContent = state.notice;
+
+  const completedInCycle = state.completed % SESSIONS_PER_CYCLE;
+
+  const count =
+    state.phase === "long" &&
+    state.completed > 0 &&
+    completedInCycle === 0
+      ? 4
+      : completedInCycle;
+
+  document.querySelectorAll(".dot").forEach((dot, i) => {
+    dot.classList.toggle("done", i < count);
+  });
+
+  document.querySelector(".cycle").setAttribute(
+    "aria-label",
+    `${count} de 4 sesiones completadas`
+  );
+
+  soundButton.setAttribute("aria-pressed", String(state.sound));
+
+  soundButton.setAttribute(
+    "aria-label",
+    state.sound
+      ? "Silenciar aviso sonoro"
+      : "Activar aviso sonoro"
+  );
+
+  soundButton.innerHTML =
+    '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+    '<path d="M11 5 6 9H3v6h3l5 4Z"/>' +
+    (
+      state.sound
+        ? '<path d="M15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/>'
+        : '<path d="m16 9 5 6m0-6-5 6"/>'
+    ) +
+    '</svg>';
+
+  requestFit();
+}
+
+function settleAll() {
+  renderDigits(false);
+
+  displays.forEach(display => {
+    Array.from(display.element.children).forEach((card, i) => {
+      settle(card, display.value[i]);
+    });
+  });
+}
+
+let fitFrame;
+
+function requestFit() {
+  cancelAnimationFrame(fitFrame);
+  fitFrame = requestAnimationFrame(fit);
+}
+
+function fit() {
+  const width = widget.clientWidth;
+  const height = frame.clientHeight;
+
+  if (width <= 0 || height <= 0) return;
+
+  root.dataset.layout = width < 220 ? "narrow" : "wide";
+
+  let low = 1;
+  let high = 90;
+
+  for (let i = 0; i < 20; i++) {
+    const unit = (low + high) / 2;
+
+    root.style.setProperty("--unit", unit + "px");
+    root.style.setProperty("--gap", Math.max(2, unit * .07) + "px");
+
+    const timer = document.querySelector(".timer");
+
+    const fits =
+      timer.scrollWidth <= width &&
+      widget.scrollHeight <= height;
+
+    if (fits) {
+      low = unit;
+    } else {
+      high = unit;
+    }
+  }
+
+  root.style.setProperty("--unit", low + "px");
+  root.style.setProperty("--gap", Math.max(2, low * .07) + "px");
+}
+
+startButton.addEventListener("click", () => {
+  unlockAudio();
+
+  if (completeIfDue()) {
+    renderUI();
+    settleAll();
+    return;
+  }
+
+  if (state.deadline !== null) {
+    state.remainingMs = remainingMs();
+    state.deadline = null;
+    state.notice = "En pausa. Continúa cuando quieras.";
+  } else {
+    state.deadline = Date.now() + state.remainingMs;
+    state.notice = state.phase === "focus"
+      ? "Una cosa a la vez."
+      : "Tiempo para descansar.";
+  }
+
+  save();
+  renderUI();
+  renderDigits(false);
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  state.deadline = null;
+  state.remainingMs = duration(state.phase);
+  state.notice = "Etapa reiniciada.";
+
+  save();
+  renderUI();
+  settleAll();
+});
+
+document.querySelectorAll(".mode").forEach(button => {
+  button.addEventListener("click", () => {
+    const next = button.dataset.mode;
+    if (next === state.phase) return;
+
+    state.phase = next;
+    state.deadline = null;
+    state.remainingMs = duration(next);
+    state.notice = next === "focus"
+      ? "Listo para concentrarte."
+      : "Tu pausa está lista.";
+
+    save();
+    renderUI();
+    settleAll();
+  });
+});
+
+soundButton.addEventListener("click", () => {
+  state.sound = !state.sound;
+  unlockAudio();
+  save();
+  renderUI();
+});
+
+completeIfDue(Date.now(), false);
+renderDigits(false);
+renderUI();
+fit();
+
+setInterval(() => {
+  if (completeIfDue()) renderUI();
+  renderDigits(!document.hidden);
+}, 200);
+
+new ResizeObserver(requestFit).observe(frame);
+
+document.fonts.ready.then(requestFit);
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    if (completeIfDue()) renderUI();
+    settleAll();
+    requestFit();
+  }
+});
+
+window.addEventListener("pageshow", () => {
+  if (completeIfDue()) renderUI();
+  settleAll();
+  requestFit();
+});
+
+reduced.addEventListener("change", settleAll);
+
+window.addEventListener("storage", event => {
+  if (event.key !== STORAGE_KEY || !event.newValue) return;
+
+  try {
+    const incoming = JSON.parse(event.newValue);
+
+    if (valid(incoming)) {
+      state = incoming;
+      completeIfDue(Date.now(), false);
+      renderUI();
+      settleAll();
+    }
+  } catch (error) {}
+});
+</script>
+</body>
+</html>
