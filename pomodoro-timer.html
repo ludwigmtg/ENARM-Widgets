@@ -16,7 +16,7 @@
 }
 
 :root {
-  --bg: #ffffff;
+  --bg: #fff;
   --ink: #141413;
   --muted: #928f85;
   --upper: #f5f4f1;
@@ -57,9 +57,12 @@
   --wash: rgba(120,140,93,.12);
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -70,8 +73,12 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family:
-    Poppins, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Arial, sans-serif;
+    Poppins,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Arial,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -149,7 +156,9 @@ button:focus-visible {
   background: var(--wash);
 }
 
-.mode:hover { background: var(--lower); }
+.mode:hover {
+  background: var(--lower);
+}
 
 .timer {
   display: flex;
@@ -173,7 +182,7 @@ button:focus-visible {
 .digits {
   display: flex;
   gap: var(--gap);
-  font-family: "EB Garamond", Garamond, Georgia, serif;
+  font-family: "EB Garamond",Garamond,Georgia,serif;
   font-weight: 450;
   font-variant-numeric: lining-nums tabular-nums;
 }
@@ -191,7 +200,7 @@ button:focus-visible {
   justify-content: center;
   height: calc(var(--unit) * 1.5);
   width: calc(var(--unit) * .22);
-  font-family: "EB Garamond", Garamond, Georgia, serif;
+  font-family: "EB Garamond",Garamond,Georgia,serif;
   font-size: calc(var(--unit) * .9);
   color: var(--muted);
   flex: none;
@@ -296,7 +305,9 @@ button:focus-visible {
   background: var(--hinge);
 }
 
-.dot.done { background: var(--accent); }
+.dot.done {
+  background: var(--accent);
+}
 
 .controls {
   display: grid;
@@ -311,7 +322,7 @@ button:focus-visible {
   border: 0;
   border-radius: 5px;
   background: var(--accent);
-  color: #ffffff;
+  color: #fff;
   font-size: 11px;
   font-weight: 500;
 }
@@ -328,7 +339,9 @@ button:focus-visible {
   color: var(--muted);
 }
 
-.icon:hover { background: var(--lower); }
+.icon:hover {
+  background: var(--lower);
+}
 
 .icon svg {
   width: 16px;
@@ -356,7 +369,9 @@ button:focus-visible {
   gap: 12px;
 }
 
-:root[data-layout="narrow"] .colon { display: none; }
+:root[data-layout="narrow"] .colon {
+  display: none;
+}
 
 :root[data-layout="narrow"] .seconds {
   --card-w: calc(var(--unit) * .60);
@@ -364,7 +379,9 @@ button:focus-visible {
   --font: calc(var(--unit) * .86);
 }
 
-:root[data-layout="narrow"] .seconds .glyph { opacity: .75; }
+:root[data-layout="narrow"] .seconds .glyph {
+  opacity: .75;
+}
 
 @media (max-width: 155px) {
   .controls {
@@ -377,123 +394,160 @@ button:focus-visible {
     min-width: 100px;
   }
 
-  .mode { font-size: 9px; }
-  .heading { margin-bottom: 8px; }
-  .modes { margin-bottom: 10px; }
+  .mode {
+    font-size: 9px;
+  }
+
+  .heading {
+    margin-bottom: 8px;
+  }
+
+  .modes {
+    margin-bottom: 10px;
+  }
 }
 
 @keyframes fold-out {
-  from { transform: rotateX(0); filter: brightness(1); }
-  to { transform: rotateX(-90deg); filter: brightness(.82); }
+  from {
+    transform: rotateX(0);
+    filter: brightness(1);
+  }
+
+  to {
+    transform: rotateX(-90deg);
+    filter: brightness(.82);
+  }
 }
 
 @keyframes fold-in {
-  from { transform: rotateX(90deg); filter: brightness(.82); }
-  to { transform: rotateX(0); filter: brightness(1); }
+  from {
+    transform: rotateX(90deg);
+    filter: brightness(.82);
+  }
+
+  to {
+    transform: rotateX(0);
+    filter: brightness(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .incoming, .outgoing { animation: none; }
+  .incoming,
+  .outgoing {
+    animation: none;
+  }
 }
 </style>
 </head>
 
 <body>
 <main>
-  <section class="widget" aria-label="Temporizador Pomodoro">
-    <header class="heading">
-      <h1>POMODORO</h1>
-    </header>
+<section class="widget" aria-label="Temporizador Pomodoro">
 
-    <nav class="modes" aria-label="Etapa del temporizador">
-      <button
-        type="button"
-        class="mode"
-        data-mode="focus"
-        aria-pressed="true"
-      >Enfoque</button>
+  <header class="heading">
+    <h1>POMODORO</h1>
+  </header>
 
-      <button
-        type="button"
-        class="mode"
-        data-mode="short"
-        aria-pressed="false"
-      >Pausa</button>
+  <nav class="modes" aria-label="Etapa del temporizador">
+    <button
+      type="button"
+      class="mode"
+      data-mode="focus"
+      aria-pressed="true"
+    >Enfoque</button>
 
-      <button
-        type="button"
-        class="mode"
-        data-mode="long"
-        aria-pressed="false"
-        aria-label="Pausa larga"
-      >Larga</button>
-    </nav>
+    <button
+      type="button"
+      class="mode"
+      data-mode="short"
+      aria-pressed="false"
+    >Pausa</button>
 
-    <div
-      class="timer"
-      role="img"
-      aria-label="25 minutos restantes"
-      id="timer"
+    <button
+      type="button"
+      class="mode"
+      data-mode="long"
+      aria-pressed="false"
+      aria-label="Pausa larga"
+    >Larga</button>
+  </nav>
+
+  <div
+    class="timer"
+    role="img"
+    aria-label="25 minutos restantes"
+    id="timer"
+  >
+    <div class="time-group minutes">
+      <div class="digits" id="minutes" aria-hidden="true"></div>
+      <span class="label">MINUTOS</span>
+    </div>
+
+    <span class="colon" aria-hidden="true">:</span>
+
+    <div class="time-group seconds">
+      <div class="digits" id="seconds" aria-hidden="true"></div>
+      <span class="label">SEGUNDOS</span>
+    </div>
+  </div>
+
+  <div
+    class="cycle"
+    role="img"
+    aria-label="0 de 4 sesiones completadas"
+  >
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <div class="controls">
+    <button type="button" class="start" id="start">
+      Iniciar
+    </button>
+
+    <button
+      type="button"
+      class="icon"
+      id="reset"
+      aria-label="Reiniciar etapa actual"
+      title="Reiniciar etapa"
     >
-      <div class="time-group minutes">
-        <div class="digits" id="minutes" aria-hidden="true"></div>
-        <span class="label">MINUTOS</span>
-      </div>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/>
+      </svg>
+    </button>
 
-      <span class="colon" aria-hidden="true">:</span>
+    <button
+      type="button"
+      class="icon"
+      id="sound"
+      aria-label="Silenciar sonidos"
+      aria-pressed="true"
+    ></button>
+  </div>
 
-      <div class="time-group seconds">
-        <div class="digits" id="seconds" aria-hidden="true"></div>
-        <span class="label">SEGUNDOS</span>
-      </div>
-    </div>
+  <p
+    class="status"
+    id="status"
+    role="status"
+    aria-live="polite"
+  >Listo para concentrarte.</p>
 
-    <div
-      class="cycle"
-      role="img"
-      aria-label="0 de 4 sesiones completadas"
-    >
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-    </div>
-
-    <div class="controls">
-      <button type="button" class="start" id="start">Iniciar</button>
-
-      <button
-        type="button"
-        class="icon"
-        id="reset"
-        aria-label="Reiniciar etapa actual"
-        title="Reiniciar etapa"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/>
-        </svg>
-      </button>
-
-      <button
-        type="button"
-        class="icon"
-        id="sound"
-        aria-label="Silenciar aviso sonoro"
-        aria-pressed="true"
-      ></button>
-    </div>
-
-    <p class="status" id="status" role="status" aria-live="polite">
-      Listo para concentrarte.
-    </p>
-  </section>
+</section>
 </main>
 
 <script>
 "use strict";
 
 // Duraciones en minutos.
-const DURATIONS = { focus: 25, short: 5, long: 15 };
+const DURATIONS = {
+  focus: 25,
+  short: 5,
+  long: 15
+};
+
 const SESSIONS_PER_CYCLE = 4;
 const STORAGE_KEY = "enarm-pomodoro-v1";
 
@@ -503,7 +557,10 @@ const frame = document.querySelector("main");
 const startButton = document.getElementById("start");
 const soundButton = document.getElementById("sound");
 const statusText = document.getElementById("status");
-const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+
+const reduced = matchMedia(
+  "(prefers-reduced-motion: reduce)"
+);
 
 const theme = new URLSearchParams(location.search).get("theme");
 
@@ -525,33 +582,48 @@ function freshState() {
   };
 }
 
-function valid(s) {
-  return s &&
-    s.version === 1 &&
-    Object.hasOwn(DURATIONS, s.phase) &&
-    Number.isFinite(s.remainingMs) &&
-    s.remainingMs >= 0 &&
-    s.remainingMs <= duration(s.phase) &&
-    (s.deadline === null || Number.isFinite(s.deadline)) &&
-    Number.isInteger(s.completed) &&
-    s.completed >= 0 &&
-    typeof s.sound === "boolean" &&
-    typeof s.notice === "string";
+function valid(saved) {
+  return (
+    saved &&
+    saved.version === 1 &&
+    Object.hasOwn(DURATIONS, saved.phase) &&
+    Number.isFinite(saved.remainingMs) &&
+    saved.remainingMs >= 0 &&
+    saved.remainingMs <= duration(saved.phase) &&
+    (
+      saved.deadline === null ||
+      Number.isFinite(saved.deadline)
+    ) &&
+    Number.isInteger(saved.completed) &&
+    saved.completed >= 0 &&
+    typeof saved.sound === "boolean" &&
+    typeof saved.notice === "string"
+  );
 }
 
 let state = freshState();
 
 try {
-  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-  if (valid(saved)) state = saved;
-} catch (error) {
-  // El temporizador funciona aunque el embed bloquee el almacenamiento.
+  const saved = JSON.parse(
+    localStorage.getItem(STORAGE_KEY)
+  );
+
+  if (valid(saved)) {
+    state = saved;
+  }
+} catch {
+  // También funciona si el embed bloquea el almacenamiento.
 }
 
 function save() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch (error) {}
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(state)
+    );
+  } catch {
+    // La sesión continúa aunque no pueda guardarse.
+  }
 }
 
 function remainingMs(now = Date.now()) {
@@ -563,59 +635,217 @@ function remainingMs(now = Date.now()) {
   );
 }
 
-let audioContext;
+/*
+ * Cada nota contiene:
+ * [frecuencia, inicio relativo, duración, volumen]
+ *
+ * Todos los sonidos se generan mediante Web Audio.
+ */
+const SOUNDS = {
+  start: [
+    [523.25, 0, .08, .07],
+    [659.25, .09, .12, .07]
+  ],
 
-function unlockAudio() {
-  if (!state.sound) return;
+  pause: [
+    [587.33, 0, .08, .06],
+    [440, .09, .12, .06]
+  ],
+
+  resume: [
+    [587.33, 0, .07, .07],
+    [783.99, .09, .12, .07]
+  ],
+
+  reset: [
+    [523.25, 0, .07, .06],
+    [392, .09, .14, .06]
+  ],
+
+  focus: [
+    [440, 0, .07, .06],
+    [659.25, .09, .12, .06]
+  ],
+
+  short: [
+    [659.25, 0, .07, .06],
+    [523.25, .09, .12, .06]
+  ],
+
+  long: [
+    [659.25, 0, .07, .06],
+    [493.88, .09, .07, .06],
+    [392, .18, .14, .06]
+  ],
+
+  soundOn: [
+    [659.25, 0, .08, .07],
+    [880, .10, .14, .07]
+  ],
+
+  soundOff: [
+    [523.25, 0, .08, .05],
+    [349.23, .10, .13, .05]
+  ],
+
+  finish: [
+    [659.25, 0, .32, .12],
+    [783.99, .28, .32, .12],
+    [1046.5, .56, .55, .12],
+    [659.25, 1.20, .32, .10],
+    [783.99, 1.48, .32, .10],
+    [1046.5, 1.76, .70, .10]
+  ]
+};
+
+let audioContext;
+let masterGain;
+let audioWarning = "";
+
+async function unlockAudio() {
+  let timeout;
 
   try {
-    const Audio = window.AudioContext || window.webkitAudioContext;
-    if (!Audio) return;
+    const Audio =
+      window.AudioContext ||
+      window.webkitAudioContext;
 
-    audioContext = audioContext || new Audio();
+    if (!Audio) {
+      audioWarning =
+        "Este navegador no permite generar audio.";
 
-    if (audioContext.state === "suspended") {
-      audioContext.resume().catch(() => {});
+      return false;
     }
-  } catch (error) {}
-}
 
-function chime() {
-  if (
-    !state.sound ||
-    !audioContext ||
-    audioContext.state !== "running"
-  ) return;
+    if (
+      !audioContext ||
+      audioContext.state === "closed"
+    ) {
+      audioContext = new Audio();
 
-  for (let i = 0; i < 3; i++) {
-    const oscillator = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-    const at = audioContext.currentTime + i * .28;
+      masterGain = audioContext.createGain();
+      masterGain.gain.value = .8;
+      masterGain.connect(audioContext.destination);
+    }
 
-    oscillator.type = "sine";
-    oscillator.frequency.value = i === 2 ? 784 : 660;
+    if (audioContext.state !== "running") {
+      // Se solicita desde la pulsación del botón.
+      await Promise.race([
+        audioContext.resume(),
+        new Promise(resolve => {
+          timeout = setTimeout(resolve, 1500);
+        })
+      ]);
+    }
 
-    gain.gain.setValueAtTime(0, at);
-    gain.gain.linearRampToValueAtTime(.12, at + .015);
-    gain.gain.exponentialRampToValueAtTime(.001, at + .2);
+    if (audioContext.state !== "running") {
+      audioWarning =
+        "Audio bloqueado. Pulsa un botón para volver a activarlo.";
 
-    oscillator.connect(gain);
-    gain.connect(audioContext.destination);
+      return false;
+    }
 
-    oscillator.start(at);
-    oscillator.stop(at + .22);
+    audioWarning = "";
+    return true;
+  } catch {
+    audioWarning =
+      "No se pudo activar el audio. Prueba de nuevo desde un botón.";
+
+    return false;
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
-function completeIfDue(now = Date.now(), notify = true) {
-  if (state.deadline === null || now < state.deadline) return false;
+function tone(frequency, at, length, volume) {
+  const oscillator = audioContext.createOscillator();
+  const envelope = audioContext.createGain();
+
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(frequency, at);
+
+  envelope.gain.setValueAtTime(.0001, at);
+  envelope.gain.linearRampToValueAtTime(
+    volume,
+    at + .008
+  );
+
+  envelope.gain.exponentialRampToValueAtTime(
+    .0001,
+    at + length
+  );
+
+  oscillator.connect(envelope);
+  envelope.connect(masterGain);
+
+  oscillator.onended = () => {
+    oscillator.disconnect();
+    envelope.disconnect();
+  };
+
+  oscillator.start(at);
+  oscillator.stop(at + length + .025);
+}
+
+async function playSound(name, force = false) {
+  if (!state.sound && !force) return false;
+
+  try {
+    if (!await unlockAudio()) {
+      if (state.sound) renderUI();
+      return false;
+    }
+
+    if (!state.sound && !force) return false;
+
+    const at = audioContext.currentTime + .01;
+    const notes = SOUNDS[name] || SOUNDS.start;
+
+    for (
+      const [frequency, offset, length, volume]
+      of notes
+    ) {
+      tone(
+        frequency,
+        at + offset,
+        length,
+        volume
+      );
+    }
+
+    renderUI();
+    return true;
+  } catch {
+    audioWarning =
+      "El navegador no pudo reproducir el sonido.";
+
+    if (state.sound) renderUI();
+    return false;
+  }
+}
+
+function chime() {
+  return playSound("finish");
+}
+
+function completeIfDue(
+  now = Date.now(),
+  notify = true
+) {
+  if (
+    state.deadline === null ||
+    now < state.deadline
+  ) {
+    return false;
+  }
 
   if (state.phase === "focus") {
     state.completed++;
 
-    state.phase = state.completed % SESSIONS_PER_CYCLE === 0
-      ? "long"
-      : "short";
+    state.phase =
+      state.completed % SESSIONS_PER_CYCLE === 0
+        ? "long"
+        : "short";
 
     state.notice = state.phase === "long"
       ? "Cuatro sesiones completas. Pausa larga lista."
@@ -629,25 +859,36 @@ function completeIfDue(now = Date.now(), notify = true) {
   state.remainingMs = duration(state.phase);
 
   save();
+
   if (notify) chime();
 
   return true;
 }
 
 const displays = [
-  { element: document.getElementById("minutes"), value: "" },
-  { element: document.getElementById("seconds"), value: "" }
+  {
+    element: document.getElementById("minutes"),
+    value: ""
+  },
+  {
+    element: document.getElementById("seconds"),
+    value: ""
+  }
 ];
 
 function half(position, value, extra = "") {
   const part = document.createElement("div");
-  part.className = `half ${position} ${extra}`;
+
+  part.className =
+    "half " + position + " " + extra;
 
   const glyph = document.createElement("span");
+
   glyph.className = "glyph";
   glyph.textContent = value;
 
   part.appendChild(glyph);
+
   return part;
 }
 
@@ -675,70 +916,88 @@ function renderDigits(animate = true) {
     if (value === previous) return;
 
     if (value.length !== previous.length) {
-      Array.from(display.element.children).forEach(card => {
-        clearTimeout(card.timer);
-      });
+      Array.from(display.element.children)
+        .forEach(card => clearTimeout(card.timer));
 
       display.element.replaceChildren();
 
       for (const digit of value) {
         const card = document.createElement("div");
+
         card.className = "digit";
         settle(card, digit);
+
         display.element.appendChild(card);
       }
     } else {
-      Array.from(display.element.children).forEach((card, i) => {
-        if (previous[i] === value[i]) return;
+      Array.from(display.element.children)
+        .forEach((card, i) => {
+          if (previous[i] === value[i]) return;
 
-        settle(card, value[i]);
+          settle(card, value[i]);
 
-        if (animate && !reduced.matches) {
-          card.replaceChildren(
-            half("top", value[i]),
-            half("bottom", previous[i]),
-            half("top", previous[i], "outgoing"),
-            half("bottom", value[i], "incoming")
-          );
+          if (animate && !reduced.matches) {
+            card.replaceChildren(
+              half("top", value[i]),
+              half("bottom", previous[i]),
+              half("top", previous[i], "outgoing"),
+              half("bottom", value[i], "incoming")
+            );
 
-          card.timer = setTimeout(() => {
-            settle(card, value[i]);
-          }, 460);
-        }
-      });
+            card.timer = setTimeout(
+              () => settle(card, value[i]),
+              460
+            );
+          }
+        });
     }
 
     display.value = value;
   });
 
-  document.getElementById("timer").setAttribute(
-    "aria-label",
-    `${Number(values[0])} minutos y ${Number(values[1])} segundos restantes`
-  );
+  const label =
+    Number(values[0]) +
+    " minutos y " +
+    Number(values[1]) +
+    " segundos restantes";
 
-  document.title = values.join(":") + " · " +
+  document.getElementById("timer")
+    .setAttribute("aria-label", label);
+
+  document.title =
+    values.join(":") +
+    " · " +
     (state.phase === "focus" ? "Enfoque" : "Pausa");
 }
 
 function renderUI() {
   root.dataset.phase = state.phase;
 
-  document.querySelectorAll(".mode").forEach(button => {
-    button.setAttribute(
-      "aria-pressed",
-      String(button.dataset.mode === state.phase)
+  document.querySelectorAll(".mode")
+    .forEach(button => {
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.mode === state.phase)
+      );
+    });
+
+  startButton.textContent =
+    state.deadline !== null
+      ? "Pausar"
+      : state.remainingMs < duration(state.phase)
+        ? "Continuar"
+        : "Iniciar";
+
+  statusText.textContent =
+    state.notice +
+    (
+      state.sound && audioWarning
+        ? " " + audioWarning
+        : ""
     );
-  });
 
-  startButton.textContent = state.deadline !== null
-    ? "Pausar"
-    : state.remainingMs < duration(state.phase)
-      ? "Continuar"
-      : "Iniciar";
-
-  statusText.textContent = state.notice;
-
-  const completedInCycle = state.completed % SESSIONS_PER_CYCLE;
+  const completedInCycle =
+    state.completed % SESSIONS_PER_CYCLE;
 
   const count =
     state.phase === "long" &&
@@ -747,23 +1006,31 @@ function renderUI() {
       ? 4
       : completedInCycle;
 
-  document.querySelectorAll(".dot").forEach((dot, i) => {
-    dot.classList.toggle("done", i < count);
-  });
+  document.querySelectorAll(".dot")
+    .forEach((dot, index) => {
+      dot.classList.toggle("done", index < count);
+    });
 
   document.querySelector(".cycle").setAttribute(
     "aria-label",
-    `${count} de 4 sesiones completadas`
+    count + " de 4 sesiones completadas"
   );
 
-  soundButton.setAttribute("aria-pressed", String(state.sound));
+  soundButton.setAttribute(
+    "aria-pressed",
+    String(state.sound)
+  );
 
   soundButton.setAttribute(
     "aria-label",
     state.sound
-      ? "Silenciar aviso sonoro"
-      : "Activar aviso sonoro"
+      ? "Silenciar sonidos"
+      : "Activar y probar sonidos"
   );
+
+  soundButton.title = state.sound
+    ? "Silenciar sonidos"
+    : "Activar y probar sonidos";
 
   soundButton.innerHTML =
     '<svg viewBox="0 0 24 24" aria-hidden="true">' +
@@ -773,7 +1040,7 @@ function renderUI() {
         ? '<path d="M15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/>'
         : '<path d="m16 9 5 6m0-6-5 6"/>'
     ) +
-    '</svg>';
+    "</svg>";
 
   requestFit();
 }
@@ -782,9 +1049,10 @@ function settleAll() {
   renderDigits(false);
 
   displays.forEach(display => {
-    Array.from(display.element.children).forEach((card, i) => {
-      settle(card, display.value[i]);
-    });
+    Array.from(display.element.children)
+      .forEach((card, index) => {
+        settle(card, display.value[index]);
+      });
   });
 }
 
@@ -801,7 +1069,8 @@ function fit() {
 
   if (width <= 0 || height <= 0) return;
 
-  root.dataset.layout = width < 220 ? "narrow" : "wide";
+  root.dataset.layout =
+    width < 220 ? "narrow" : "wide";
 
   let low = 1;
   let high = 90;
@@ -810,7 +1079,11 @@ function fit() {
     const unit = (low + high) / 2;
 
     root.style.setProperty("--unit", unit + "px");
-    root.style.setProperty("--gap", Math.max(2, unit * .07) + "px");
+
+    root.style.setProperty(
+      "--gap",
+      Math.max(2, unit * .07) + "px"
+    );
 
     const timer = document.querySelector(".timer");
 
@@ -826,12 +1099,14 @@ function fit() {
   }
 
   root.style.setProperty("--unit", low + "px");
-  root.style.setProperty("--gap", Math.max(2, low * .07) + "px");
+
+  root.style.setProperty(
+    "--gap",
+    Math.max(2, low * .07) + "px"
+  );
 }
 
 startButton.addEventListener("click", () => {
-  unlockAudio();
-
   if (completeIfDue()) {
     renderUI();
     settleAll();
@@ -839,11 +1114,21 @@ startButton.addEventListener("click", () => {
   }
 
   if (state.deadline !== null) {
+    void playSound("pause");
+
     state.remainingMs = remainingMs();
     state.deadline = null;
-    state.notice = "En pausa. Continúa cuando quieras.";
+    state.notice =
+      "En pausa. Continúa cuando quieras.";
   } else {
+    void playSound(
+      state.remainingMs < duration(state.phase)
+        ? "resume"
+        : "start"
+    );
+
     state.deadline = Date.now() + state.remainingMs;
+
     state.notice = state.phase === "focus"
       ? "Una cosa a la vez."
       : "Tiempo para descansar.";
@@ -854,39 +1139,55 @@ startButton.addEventListener("click", () => {
   renderDigits(false);
 });
 
-document.getElementById("reset").addEventListener("click", () => {
-  state.deadline = null;
-  state.remainingMs = duration(state.phase);
-  state.notice = "Etapa reiniciada.";
+document.getElementById("reset")
+  .addEventListener("click", () => {
+    void playSound("reset");
 
-  save();
-  renderUI();
-  settleAll();
-});
-
-document.querySelectorAll(".mode").forEach(button => {
-  button.addEventListener("click", () => {
-    const next = button.dataset.mode;
-    if (next === state.phase) return;
-
-    state.phase = next;
     state.deadline = null;
-    state.remainingMs = duration(next);
-    state.notice = next === "focus"
-      ? "Listo para concentrarte."
-      : "Tu pausa está lista.";
+    state.remainingMs = duration(state.phase);
+    state.notice = "Etapa reiniciada.";
 
     save();
     renderUI();
     settleAll();
   });
-});
+
+document.querySelectorAll(".mode")
+  .forEach(button => {
+    button.addEventListener("click", () => {
+      const next = button.dataset.mode;
+
+      void playSound(next);
+
+      if (next === state.phase) return;
+
+      state.phase = next;
+      state.deadline = null;
+      state.remainingMs = duration(next);
+
+      state.notice = next === "focus"
+        ? "Listo para concentrarte."
+        : "Tu pausa está lista.";
+
+      save();
+      renderUI();
+      settleAll();
+    });
+  });
 
 soundButton.addEventListener("click", () => {
   state.sound = !state.sound;
-  unlockAudio();
+  audioWarning = "";
+
   save();
   renderUI();
+
+  // Confirma también al silenciar.
+  // Las siguientes acciones ya no emitirán sonido.
+  void playSound(
+    state.sound ? "soundOn" : "soundOff",
+    true
+  );
 });
 
 completeIfDue(Date.now(), false);
@@ -895,7 +1196,10 @@ renderUI();
 fit();
 
 setInterval(() => {
-  if (completeIfDue()) renderUI();
+  if (completeIfDue()) {
+    renderUI();
+  }
+
   renderDigits(!document.hidden);
 }, 200);
 
@@ -905,14 +1209,20 @@ document.fonts.ready.then(requestFit);
 
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
-    if (completeIfDue()) renderUI();
+    if (completeIfDue()) {
+      renderUI();
+    }
+
     settleAll();
     requestFit();
   }
 });
 
 window.addEventListener("pageshow", () => {
-  if (completeIfDue()) renderUI();
+  if (completeIfDue()) {
+    renderUI();
+  }
+
   settleAll();
   requestFit();
 });
@@ -920,18 +1230,26 @@ window.addEventListener("pageshow", () => {
 reduced.addEventListener("change", settleAll);
 
 window.addEventListener("storage", event => {
-  if (event.key !== STORAGE_KEY || !event.newValue) return;
+  if (
+    event.key !== STORAGE_KEY ||
+    !event.newValue
+  ) {
+    return;
+  }
 
   try {
     const incoming = JSON.parse(event.newValue);
 
     if (valid(incoming)) {
       state = incoming;
+
       completeIfDue(Date.now(), false);
       renderUI();
       settleAll();
     }
-  } catch (error) {}
+  } catch {
+    // Ignora estados incompletos o inválidos.
+  }
 });
 </script>
 </body>
