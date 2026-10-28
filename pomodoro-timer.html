@@ -7,539 +7,463 @@
 <title>Pomodoro · Estudio</title>
 
 <style>
-@font-face {
-  font-family: "EB Garamond";
-  src: url("./EBGaramond-VariableFont_wght.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 400 800;
-  font-display: swap;
+@font-face{
+  font-family:'EB Garamond';
+  src:url('./EBGaramond-VariableFont_wght.ttf') format('truetype');
+  font-style:normal;
+  font-weight:400 800;
+  font-display:swap;
 }
 
-:root {
-  --bg: #fff;
-  --ink: #141413;
-  --muted: #928f85;
-  --upper: #f5f4f1;
-  --lower: #eeede9;
-  --line: rgba(20,20,19,.16);
-  --hinge: #d1cec6;
-  --accent: #d97757;
-  --wash: rgba(217,119,87,.1);
-  --unit: 48px;
-  --gap: 4px;
+:root{
+  --bg:#fff;
+  --ink:#141413;
+  --muted:#928f85;
+  --upper:#f5f4f1;
+  --lower:#eeede9;
+  --line:rgba(20,20,19,.16);
+  --hinge:#d1cec6;
+  --accent:#d97757;
+  --wash:rgba(217,119,87,.1);
+  --unit:48px;
+  --gap:4px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #191919;
-    --ink: #faf9f5;
-    --muted: #b0aea5;
-    --upper: #30302e;
-    --lower: #282826;
-    --line: rgba(0,0,0,.55);
-    --hinge: #55534e;
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#191919;
+    --ink:#faf9f5;
+    --muted:#b0aea5;
+    --upper:#30302e;
+    --lower:#282826;
+    --line:rgba(0,0,0,.55);
+    --hinge:#55534e;
   }
 }
 
-:root[data-theme="dark"] {
-  --bg: #191919;
-  --ink: #faf9f5;
-  --muted: #b0aea5;
-  --upper: #30302e;
-  --lower: #282826;
-  --line: rgba(0,0,0,.55);
-  --hinge: #55534e;
+:root[data-theme="dark"]{
+  --bg:#191919;
+  --ink:#faf9f5;
+  --muted:#b0aea5;
+  --upper:#30302e;
+  --lower:#282826;
+  --line:rgba(0,0,0,.55);
+  --hinge:#55534e;
 }
 
 :root[data-phase="short"],
-:root[data-phase="long"] {
-  --accent: #788c5d;
-  --wash: rgba(120,140,93,.12);
+:root[data-phase="long"]{
+  --accent:#788c5d;
+  --wash:rgba(120,140,93,.12);
 }
 
-* {
-  box-sizing: border-box;
+*{box-sizing:border-box}
+
+html,body{
+  width:100%;
+  height:100%;
+  margin:0;
+  overflow:hidden;
 }
 
-html,
-body {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Poppins,-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
 }
 
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family:
-    Poppins,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Arial,
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
+main{
+  position:absolute;
+  inset:0 4px;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
 }
 
-main {
-  position: absolute;
-  inset: 0 4px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+.widget{
+  width:100%;
+  max-width:400px;
+  min-width:0;
 }
 
-.widget {
-  width: 100%;
-  max-width: 400px;
-  min-width: 0;
+.heading{
+  height:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  color:var(--muted);
+  margin-bottom:10px;
 }
 
-.heading {
-  height: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  color: var(--muted);
-  margin-bottom: 10px;
+.heading::before{
+  content:'';
+  width:4px;
+  height:4px;
+  background:var(--accent);
+  border-radius:50%;
 }
 
-.heading::before {
-  content: "";
-  width: 4px;
-  height: 4px;
-  background: var(--accent);
-  border-radius: 50%;
+h1{
+  margin:0;
+  font-size:10px;
+  font-weight:500;
+  letter-spacing:1.5px;
+  line-height:1;
 }
 
-h1 {
-  margin: 0;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 1.5px;
-  line-height: 1;
+button{
+  font:inherit;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
 }
 
-button {
-  font: inherit;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+button:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
 }
 
-button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+.modes{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:3px;
+  margin-bottom:14px;
 }
 
-.modes {
-  display: grid;
-  grid-template-columns: repeat(3,minmax(0,1fr));
-  gap: 3px;
-  margin-bottom: 14px;
+.mode{
+  min-width:0;
+  min-height:30px;
+  padding:4px 2px;
+  border:0;
+  border-radius:5px;
+  background:transparent;
+  color:var(--muted);
+  font-size:10px;
 }
 
-.mode {
-  min-width: 0;
-  min-height: 30px;
-  padding: 4px 2px;
-  border: 0;
-  border-radius: 5px;
-  background: transparent;
-  color: var(--muted);
-  font-size: 10px;
+.mode[aria-pressed="true"]{
+  color:var(--accent);
+  background:var(--wash);
 }
 
-.mode[aria-pressed="true"] {
-  color: var(--accent);
-  background: var(--wash);
+.mode:hover{background:var(--lower)}
+
+.timer{
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  gap:calc(var(--unit)*.16);
 }
 
-.mode:hover {
-  background: var(--lower);
+.time-group{
+  --card-w:var(--unit);
+  --card-h:calc(var(--unit)*1.5);
+  --font:calc(var(--unit)*1.43);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  min-width:0;
 }
 
-.timer {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: calc(var(--unit) * .16);
+.digits{
+  display:flex;
+  gap:var(--gap);
+  font-family:'EB Garamond',Garamond,Georgia,serif;
+  font-weight:450;
+  font-variant-numeric:lining-nums tabular-nums;
 }
 
-.time-group {
-  --card-w: var(--unit);
-  --card-h: calc(var(--unit) * 1.5);
-  --font: calc(var(--unit) * 1.43);
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
+.label{
+  font-size:8px;
+  line-height:11px;
+  letter-spacing:1px;
+  color:var(--muted);
 }
 
-.digits {
-  display: flex;
-  gap: var(--gap);
-  font-family: "EB Garamond",Garamond,Georgia,serif;
-  font-weight: 450;
-  font-variant-numeric: lining-nums tabular-nums;
+.colon{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:calc(var(--unit)*1.5);
+  width:calc(var(--unit)*.22);
+  font-family:'EB Garamond',Garamond,Georgia,serif;
+  font-size:calc(var(--unit)*.9);
+  color:var(--muted);
+  flex:none;
 }
 
-.label {
-  font-size: 8px;
-  line-height: 11px;
-  letter-spacing: 1px;
-  color: var(--muted);
+.digit{
+  width:var(--card-w);
+  height:var(--card-h);
+  position:relative;
+  perspective:500px;
+  border-radius:4px;
+  background:var(--lower);
+  flex:none;
 }
 
-.colon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: calc(var(--unit) * 1.5);
-  width: calc(var(--unit) * .22);
-  font-family: "EB Garamond",Garamond,Georgia,serif;
-  font-size: calc(var(--unit) * .9);
-  color: var(--muted);
-  flex: none;
+.half{
+  position:absolute;
+  left:0;
+  right:0;
+  height:50%;
+  overflow:hidden;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
 }
 
-.digit {
-  width: var(--card-w);
-  height: var(--card-h);
-  position: relative;
-  perspective: 500px;
-  border-radius: 4px;
-  background: var(--lower);
-  flex: none;
+.top{
+  top:0;
+  background:var(--upper);
+  border-radius:4px 4px 0 0;
+  transform-origin:center bottom;
 }
 
-.half {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 50%;
-  overflow: hidden;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+.bottom{
+  top:50%;
+  background:var(--lower);
+  border-radius:0 0 4px 4px;
+  transform-origin:center top;
 }
 
-.top {
-  top: 0;
-  background: var(--upper);
-  border-radius: 4px 4px 0 0;
-  transform-origin: center bottom;
+.glyph{
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  height:var(--card-h);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:var(--font);
+  line-height:1;
 }
 
-.bottom {
-  top: 50%;
-  background: var(--lower);
-  border-radius: 0 0 4px 4px;
-  transform-origin: center top;
+.bottom .glyph{
+  top:calc(var(--card-h)*-.5);
 }
 
-.glyph {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: var(--card-h);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font);
-  line-height: 1;
+.digit::before{
+  content:'';
+  position:absolute;
+  left:0;
+  right:0;
+  top:calc(50% - .5px);
+  height:1px;
+  background:var(--line);
+  z-index:5;
 }
 
-.bottom .glyph {
-  top: calc(var(--card-h) * -.5);
+.digit::after{
+  content:'';
+  position:absolute;
+  left:-1px;
+  top:calc(50% - 2px);
+  width:2px;
+  height:4px;
+  border-radius:1px;
+  background:var(--hinge);
+  box-shadow:calc(var(--card-w) - 1px) 0 0 var(--hinge);
+  z-index:6;
 }
 
-.digit::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(50% - .5px);
-  height: 1px;
-  background: var(--line);
-  z-index: 5;
+.outgoing{
+  z-index:3;
+  animation:fold-out 210ms ease-in both;
 }
 
-.digit::after {
-  content: "";
-  position: absolute;
-  left: -1px;
-  top: calc(50% - 2px);
-  width: 2px;
-  height: 4px;
-  border-radius: 1px;
-  background: var(--hinge);
-  box-shadow: calc(var(--card-w) - 1px) 0 0 var(--hinge);
-  z-index: 6;
+.incoming{
+  z-index:4;
+  animation:fold-in 210ms 210ms ease-out both;
 }
 
-.outgoing {
-  z-index: 3;
-  animation: fold-out 210ms ease-in both;
+.cycle{
+  display:flex;
+  justify-content:center;
+  gap:7px;
+  margin:13px 0;
 }
 
-.incoming {
-  z-index: 4;
-  animation: fold-in 210ms 210ms ease-out both;
+.dot{
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:var(--hinge);
 }
 
-.cycle {
-  display: flex;
-  justify-content: center;
-  gap: 7px;
-  margin: 13px 0;
+.dot.done{background:var(--accent)}
+
+.controls{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 34px 34px;
+  gap:7px;
+  width:min(100%,232px);
+  margin:auto;
 }
 
-.dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--hinge);
+.start{
+  min-height:34px;
+  border:0;
+  border-radius:5px;
+  background:var(--accent);
+  color:#fff;
+  font-size:11px;
+  font-weight:500;
 }
 
-.dot.done {
-  background: var(--accent);
+.icon{
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  padding:8px;
+  border:1px solid var(--lower);
+  border-radius:5px;
+  background:transparent;
+  color:var(--muted);
 }
 
-.controls {
-  display: grid;
-  grid-template-columns: minmax(0,1fr) 34px 34px;
-  gap: 7px;
-  width: min(100%,232px);
-  margin: auto;
+.icon:hover{background:var(--lower)}
+
+.icon svg{
+  width:16px;
+  height:16px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.6;
+  stroke-linecap:round;
+  stroke-linejoin:round;
 }
 
-.start {
-  min-height: 34px;
-  border: 0;
-  border-radius: 5px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 500;
+.status{
+  min-height:28px;
+  font-size:10px;
+  line-height:14px;
+  text-align:center;
+  color:var(--muted);
+  margin:9px 0 0;
+  text-wrap:pretty;
 }
 
-.icon {
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  padding: 8px;
-  border: 1px solid var(--lower);
-  border-radius: 5px;
-  background: transparent;
-  color: var(--muted);
+:root[data-layout="narrow"] .timer{
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
 }
 
-.icon:hover {
-  background: var(--lower);
+:root[data-layout="narrow"] .colon{
+  display:none;
 }
 
-.icon svg {
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+:root[data-layout="narrow"] .seconds{
+  --card-w:calc(var(--unit)*.60);
+  --card-h:calc(var(--unit)*.90);
+  --font:calc(var(--unit)*.86);
 }
 
-.status {
-  min-height: 28px;
-  font-size: 10px;
-  line-height: 14px;
-  text-align: center;
-  color: var(--muted);
-  margin: 9px 0 0;
-  text-wrap: pretty;
+:root[data-layout="narrow"] .seconds .glyph{
+  opacity:.75;
 }
 
-:root[data-layout="narrow"] .timer {
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-:root[data-layout="narrow"] .colon {
-  display: none;
-}
-
-:root[data-layout="narrow"] .seconds {
-  --card-w: calc(var(--unit) * .60);
-  --card-h: calc(var(--unit) * .90);
-  --font: calc(var(--unit) * .86);
-}
-
-:root[data-layout="narrow"] .seconds .glyph {
-  opacity: .75;
-}
-
-@media (max-width: 155px) {
-  .controls {
-    grid-template-columns: 34px 34px;
-    justify-content: center;
+@media(max-width:155px){
+  .controls{
+    grid-template-columns:34px 34px;
+    justify-content:center;
   }
 
-  .start {
-    grid-column: 1 / -1;
-    min-width: 100px;
+  .start{
+    grid-column:1/-1;
+    min-width:100px;
   }
 
-  .mode {
-    font-size: 9px;
-  }
-
-  .heading {
-    margin-bottom: 8px;
-  }
-
-  .modes {
-    margin-bottom: 10px;
-  }
+  .mode{font-size:9px}
+  .heading{margin-bottom:8px}
+  .modes{margin-bottom:10px}
 }
 
-@keyframes fold-out {
-  from {
-    transform: rotateX(0);
-    filter: brightness(1);
-  }
-
-  to {
-    transform: rotateX(-90deg);
-    filter: brightness(.82);
-  }
+@keyframes fold-out{
+  from{transform:rotateX(0);filter:brightness(1)}
+  to{transform:rotateX(-90deg);filter:brightness(.82)}
 }
 
-@keyframes fold-in {
-  from {
-    transform: rotateX(90deg);
-    filter: brightness(.82);
-  }
-
-  to {
-    transform: rotateX(0);
-    filter: brightness(1);
-  }
+@keyframes fold-in{
+  from{transform:rotateX(90deg);filter:brightness(.82)}
+  to{transform:rotateX(0);filter:brightness(1)}
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .incoming,
-  .outgoing {
-    animation: none;
-  }
+@media(prefers-reduced-motion:reduce){
+  .incoming,.outgoing{animation:none}
 }
 </style>
 </head>
 
 <body>
 <main>
-<section class="widget" aria-label="Temporizador Pomodoro">
+  <section class="widget" aria-label="Temporizador Pomodoro">
+    <header class="heading">
+      <h1>POMODORO</h1>
+    </header>
 
-  <header class="heading">
-    <h1>POMODORO</h1>
-  </header>
+    <nav class="modes" aria-label="Etapa del temporizador">
+      <button type="button" class="mode"
+        data-mode="focus" aria-pressed="true">Enfoque</button>
 
-  <nav class="modes" aria-label="Etapa del temporizador">
-    <button
-      type="button"
-      class="mode"
-      data-mode="focus"
-      aria-pressed="true"
-    >Enfoque</button>
+      <button type="button" class="mode"
+        data-mode="short" aria-pressed="false">Pausa</button>
 
-    <button
-      type="button"
-      class="mode"
-      data-mode="short"
-      aria-pressed="false"
-    >Pausa</button>
+      <button type="button" class="mode"
+        data-mode="long" aria-pressed="false"
+        aria-label="Pausa larga">Larga</button>
+    </nav>
 
-    <button
-      type="button"
-      class="mode"
-      data-mode="long"
-      aria-pressed="false"
-      aria-label="Pausa larga"
-    >Larga</button>
-  </nav>
+    <div class="timer" role="img"
+      aria-label="25 minutos restantes" id="timer">
 
-  <div
-    class="timer"
-    role="img"
-    aria-label="25 minutos restantes"
-    id="timer"
-  >
-    <div class="time-group minutes">
-      <div class="digits" id="minutes" aria-hidden="true"></div>
-      <span class="label">MINUTOS</span>
+      <div class="time-group minutes">
+        <div class="digits" id="minutes" aria-hidden="true"></div>
+        <span class="label">MINUTOS</span>
+      </div>
+
+      <span class="colon" aria-hidden="true">:</span>
+
+      <div class="time-group seconds">
+        <div class="digits" id="seconds" aria-hidden="true"></div>
+        <span class="label">SEGUNDOS</span>
+      </div>
     </div>
 
-    <span class="colon" aria-hidden="true">:</span>
-
-    <div class="time-group seconds">
-      <div class="digits" id="seconds" aria-hidden="true"></div>
-      <span class="label">SEGUNDOS</span>
+    <div class="cycle" role="img"
+      aria-label="0 de 4 sesiones completadas">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
     </div>
-  </div>
 
-  <div
-    class="cycle"
-    role="img"
-    aria-label="0 de 4 sesiones completadas"
-  >
-    <span class="dot"></span>
-    <span class="dot"></span>
-    <span class="dot"></span>
-    <span class="dot"></span>
-  </div>
+    <div class="controls">
+      <button type="button" class="start" id="start">Iniciar</button>
 
-  <div class="controls">
-    <button type="button" class="start" id="start">
-      Iniciar
-    </button>
+      <button type="button" class="icon" id="reset"
+        aria-label="Reiniciar etapa actual" title="Reiniciar etapa">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/>
+        </svg>
+      </button>
 
-    <button
-      type="button"
-      class="icon"
-      id="reset"
-      aria-label="Reiniciar etapa actual"
-      title="Reiniciar etapa"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/>
-      </svg>
-    </button>
+      <button type="button" class="icon" id="sound"
+        aria-label="Silenciar sonidos" aria-pressed="true"></button>
+    </div>
 
-    <button
-      type="button"
-      class="icon"
-      id="sound"
-      aria-label="Silenciar sonidos"
-      aria-pressed="true"
-    ></button>
-  </div>
-
-  <p
-    class="status"
-    id="status"
-    role="status"
-    aria-live="polite"
-  >Listo para concentrarte.</p>
-
-</section>
+    <p class="status" id="status" role="status" aria-live="polite">
+      Listo para concentrarte.
+    </p>
+  </section>
 </main>
 
 <script>
-"use strict";
+'use strict';
 
 // Duraciones en minutos.
 const DURATIONS = {
@@ -549,22 +473,19 @@ const DURATIONS = {
 };
 
 const SESSIONS_PER_CYCLE = 4;
-const STORAGE_KEY = "enarm-pomodoro-v1";
+const STORAGE_KEY = 'enarm-pomodoro-v1';
 
 const root = document.documentElement;
-const widget = document.querySelector(".widget");
-const frame = document.querySelector("main");
-const startButton = document.getElementById("start");
-const soundButton = document.getElementById("sound");
-const statusText = document.getElementById("status");
+const widget = document.querySelector('.widget');
+const frame = document.querySelector('main');
+const startButton = document.getElementById('start');
+const soundButton = document.getElementById('sound');
+const statusText = document.getElementById('status');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
-const reduced = matchMedia(
-  "(prefers-reduced-motion: reduce)"
-);
+const theme = new URLSearchParams(location.search).get('theme');
 
-const theme = new URLSearchParams(location.search).get("theme");
-
-if (["light", "dark"].includes(theme)) {
+if (['light', 'dark'].includes(theme)) {
   root.dataset.theme = theme;
 }
 
@@ -573,57 +494,42 @@ const duration = phase => DURATIONS[phase] * 60000;
 function freshState() {
   return {
     version: 1,
-    phase: "focus",
-    remainingMs: duration("focus"),
+    phase: 'focus',
+    remainingMs: duration('focus'),
     deadline: null,
     completed: 0,
     sound: true,
-    notice: "Listo para concentrarte."
+    notice: 'Listo para concentrarte.'
   };
 }
 
-function valid(saved) {
-  return (
-    saved &&
-    saved.version === 1 &&
-    Object.hasOwn(DURATIONS, saved.phase) &&
-    Number.isFinite(saved.remainingMs) &&
-    saved.remainingMs >= 0 &&
-    saved.remainingMs <= duration(saved.phase) &&
-    (
-      saved.deadline === null ||
-      Number.isFinite(saved.deadline)
-    ) &&
-    Number.isInteger(saved.completed) &&
-    saved.completed >= 0 &&
-    typeof saved.sound === "boolean" &&
-    typeof saved.notice === "string"
-  );
+function valid(s) {
+  return s &&
+    s.version === 1 &&
+    Object.hasOwn(DURATIONS, s.phase) &&
+    Number.isFinite(s.remainingMs) &&
+    s.remainingMs >= 0 &&
+    s.remainingMs <= duration(s.phase) &&
+    (s.deadline === null || Number.isFinite(s.deadline)) &&
+    Number.isInteger(s.completed) &&
+    s.completed >= 0 &&
+    typeof s.sound === 'boolean' &&
+    typeof s.notice === 'string';
 }
 
 let state = freshState();
 
 try {
-  const saved = JSON.parse(
-    localStorage.getItem(STORAGE_KEY)
-  );
-
-  if (valid(saved)) {
-    state = saved;
-  }
-} catch {
-  // También funciona si el embed bloquea el almacenamiento.
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  if (valid(saved)) state = saved;
+} catch (error) {
+  // El temporizador también funciona sin almacenamiento.
 }
 
 function save() {
   try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(state)
-    );
-  } catch {
-    // La sesión continúa aunque no pueda guardarse.
-  }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {}
 }
 
 function remainingMs(now = Date.now()) {
@@ -635,101 +541,80 @@ function remainingMs(now = Date.now()) {
   );
 }
 
-/*
- * Cada nota contiene:
- * [frecuencia, inicio relativo, duración, volumen]
- *
- * Todos los sonidos se generan mediante Web Audio.
- */
+// Sonidos sintetizados:
+// [frecuencia, inicio en segundos, duración, volumen].
 const SOUNDS = {
   start: [
     [523.25, 0, .08, .07],
     [659.25, .09, .12, .07]
   ],
-
   pause: [
     [587.33, 0, .08, .06],
     [440, .09, .12, .06]
   ],
-
   resume: [
     [587.33, 0, .07, .07],
     [783.99, .09, .12, .07]
   ],
-
   reset: [
     [523.25, 0, .07, .06],
     [392, .09, .14, .06]
   ],
-
   focus: [
     [440, 0, .07, .06],
     [659.25, .09, .12, .06]
   ],
-
   short: [
     [659.25, 0, .07, .06],
     [523.25, .09, .12, .06]
   ],
-
   long: [
     [659.25, 0, .07, .06],
     [493.88, .09, .07, .06],
     [392, .18, .14, .06]
   ],
-
   soundOn: [
     [659.25, 0, .08, .07],
     [880, .10, .14, .07]
   ],
-
   soundOff: [
     [523.25, 0, .08, .05],
     [349.23, .10, .13, .05]
   ],
 
-  finish: [
-    [659.25, 0, .32, .12],
-    [783.99, .28, .32, .12],
-    [1046.5, .56, .55, .12],
-    [659.25, 1.20, .32, .10],
-    [783.99, 1.48, .32, .10],
-    [1046.5, 1.76, .70, .10]
-  ]
+  // Alarma: cuatro secuencias de tres notas.
+  // Duración total aproximada: 9 segundos.
+  // Cambia "length: 4" para ajustar las repeticiones.
+  finish: Array.from({ length: 4 }, (_, i) => [
+    [659.25, i * 2.4, .48, .12],
+    [783.99, i * 2.4 + .45, .48, .12],
+    [1046.5, i * 2.4 + .90, .90, .12]
+  ]).flat()
 };
 
 let audioContext;
 let masterGain;
-let audioWarning = "";
+let audioWarning = '';
 
 async function unlockAudio() {
   let timeout;
 
   try {
-    const Audio =
-      window.AudioContext ||
-      window.webkitAudioContext;
+    const Audio = window.AudioContext || window.webkitAudioContext;
 
     if (!Audio) {
-      audioWarning =
-        "Este navegador no permite generar audio.";
-
+      audioWarning = 'Este navegador no permite generar audio.';
       return false;
     }
 
-    if (
-      !audioContext ||
-      audioContext.state === "closed"
-    ) {
+    if (!audioContext || audioContext.state === 'closed') {
       audioContext = new Audio();
-
       masterGain = audioContext.createGain();
       masterGain.gain.value = .8;
       masterGain.connect(audioContext.destination);
     }
 
-    if (audioContext.state !== "running") {
-      // Se solicita desde la pulsación del botón.
+    if (audioContext.state !== 'running') {
       await Promise.race([
         audioContext.resume(),
         new Promise(resolve => {
@@ -738,19 +623,17 @@ async function unlockAudio() {
       ]);
     }
 
-    if (audioContext.state !== "running") {
+    if (audioContext.state !== 'running') {
       audioWarning =
-        "Audio bloqueado. Pulsa un botón para volver a activarlo.";
-
+        'Audio bloqueado. Pulsa un botón para volver a activarlo.';
       return false;
     }
 
-    audioWarning = "";
+    audioWarning = '';
     return true;
-  } catch {
+  } catch (error) {
     audioWarning =
-      "No se pudo activar el audio. Prueba de nuevo desde un botón.";
-
+      'No se pudo activar el audio. Prueba de nuevo desde un botón.';
     return false;
   } finally {
     clearTimeout(timeout);
@@ -761,19 +644,12 @@ function tone(frequency, at, length, volume) {
   const oscillator = audioContext.createOscillator();
   const envelope = audioContext.createGain();
 
-  oscillator.type = "sine";
+  oscillator.type = 'sine';
   oscillator.frequency.setValueAtTime(frequency, at);
 
   envelope.gain.setValueAtTime(.0001, at);
-  envelope.gain.linearRampToValueAtTime(
-    volume,
-    at + .008
-  );
-
-  envelope.gain.exponentialRampToValueAtTime(
-    .0001,
-    at + length
-  );
+  envelope.gain.linearRampToValueAtTime(volume, at + .008);
+  envelope.gain.exponentialRampToValueAtTime(.0001, at + length);
 
   oscillator.connect(envelope);
   envelope.connect(masterGain);
@@ -799,65 +675,47 @@ async function playSound(name, force = false) {
     if (!state.sound && !force) return false;
 
     const at = audioContext.currentTime + .01;
-    const notes = SOUNDS[name] || SOUNDS.start;
 
-    for (
-      const [frequency, offset, length, volume]
-      of notes
-    ) {
-      tone(
-        frequency,
-        at + offset,
-        length,
-        volume
-      );
+    for (const [frequency, offset, length, volume]
+      of SOUNDS[name] || SOUNDS.start) {
+      tone(frequency, at + offset, length, volume);
     }
 
     renderUI();
     return true;
-  } catch {
-    audioWarning =
-      "El navegador no pudo reproducir el sonido.";
-
+  } catch (error) {
+    audioWarning = 'El navegador no pudo reproducir el sonido.';
     if (state.sound) renderUI();
     return false;
   }
 }
 
 function chime() {
-  return playSound("finish");
+  return playSound('finish');
 }
 
-function completeIfDue(
-  now = Date.now(),
-  notify = true
-) {
-  if (
-    state.deadline === null ||
-    now < state.deadline
-  ) {
+function completeIfDue(now = Date.now(), notify = true) {
+  if (state.deadline === null || now < state.deadline) {
     return false;
   }
 
-  if (state.phase === "focus") {
+  if (state.phase === 'focus') {
     state.completed++;
 
-    state.phase =
-      state.completed % SESSIONS_PER_CYCLE === 0
-        ? "long"
-        : "short";
+    state.phase = state.completed % SESSIONS_PER_CYCLE === 0
+      ? 'long'
+      : 'short';
 
-    state.notice = state.phase === "long"
-      ? "Cuatro sesiones completas. Pausa larga lista."
-      : "Enfoque completado. Tu pausa está lista.";
+    state.notice = state.phase === 'long'
+      ? 'Cuatro sesiones completas. Pausa larga lista.'
+      : 'Enfoque completado. Tu pausa está lista.';
   } else {
-    state.phase = "focus";
-    state.notice = "Pausa terminada. Enfoque listo.";
+    state.phase = 'focus';
+    state.notice = 'Pausa terminada. Enfoque listo.';
   }
 
   state.deadline = null;
   state.remainingMs = duration(state.phase);
-
   save();
 
   if (notify) chime();
@@ -866,38 +724,27 @@ function completeIfDue(
 }
 
 const displays = [
-  {
-    element: document.getElementById("minutes"),
-    value: ""
-  },
-  {
-    element: document.getElementById("seconds"),
-    value: ""
-  }
+  { element: document.getElementById('minutes'), value: '' },
+  { element: document.getElementById('seconds'), value: '' }
 ];
 
-function half(position, value, extra = "") {
-  const part = document.createElement("div");
+function half(position, value, extra = '') {
+  const part = document.createElement('div');
+  part.className = 'half ' + position + ' ' + extra;
 
-  part.className =
-    "half " + position + " " + extra;
-
-  const glyph = document.createElement("span");
-
-  glyph.className = "glyph";
+  const glyph = document.createElement('span');
+  glyph.className = 'glyph';
   glyph.textContent = value;
 
   part.appendChild(glyph);
-
   return part;
 }
 
 function settle(card, value) {
   clearTimeout(card.timer);
-
   card.replaceChildren(
-    half("top", value),
-    half("bottom", value)
+    half('top', value),
+    half('bottom', value)
   );
 }
 
@@ -905,8 +752,8 @@ function renderDigits(animate = true) {
   const seconds = Math.ceil(remainingMs() / 1000);
 
   const values = [
-    String(Math.floor(seconds / 60)).padStart(2, "0"),
-    String(seconds % 60).padStart(2, "0")
+    String(Math.floor(seconds / 60)).padStart(2, '0'),
+    String(seconds % 60).padStart(2, '0')
   ];
 
   displays.forEach((display, index) => {
@@ -916,131 +763,104 @@ function renderDigits(animate = true) {
     if (value === previous) return;
 
     if (value.length !== previous.length) {
-      Array.from(display.element.children)
-        .forEach(card => clearTimeout(card.timer));
+      Array.from(display.element.children).forEach(card => {
+        clearTimeout(card.timer);
+      });
 
       display.element.replaceChildren();
 
       for (const digit of value) {
-        const card = document.createElement("div");
-
-        card.className = "digit";
+        const card = document.createElement('div');
+        card.className = 'digit';
         settle(card, digit);
-
         display.element.appendChild(card);
       }
     } else {
-      Array.from(display.element.children)
-        .forEach((card, i) => {
-          if (previous[i] === value[i]) return;
+      Array.from(display.element.children).forEach((card, i) => {
+        if (previous[i] === value[i]) return;
 
-          settle(card, value[i]);
+        settle(card, value[i]);
 
-          if (animate && !reduced.matches) {
-            card.replaceChildren(
-              half("top", value[i]),
-              half("bottom", previous[i]),
-              half("top", previous[i], "outgoing"),
-              half("bottom", value[i], "incoming")
-            );
+        if (animate && !reduced.matches) {
+          card.replaceChildren(
+            half('top', value[i]),
+            half('bottom', previous[i]),
+            half('top', previous[i], 'outgoing'),
+            half('bottom', value[i], 'incoming')
+          );
 
-            card.timer = setTimeout(
-              () => settle(card, value[i]),
-              460
-            );
-          }
-        });
+          card.timer = setTimeout(() => {
+            settle(card, value[i]);
+          }, 460);
+        }
+      });
     }
 
     display.value = value;
   });
 
-  const label =
-    Number(values[0]) +
-    " minutos y " +
-    Number(values[1]) +
-    " segundos restantes";
+  document.getElementById('timer').setAttribute(
+    'aria-label',
+    Number(values[0]) + ' minutos y ' +
+    Number(values[1]) + ' segundos restantes'
+  );
 
-  document.getElementById("timer")
-    .setAttribute("aria-label", label);
-
-  document.title =
-    values.join(":") +
-    " · " +
-    (state.phase === "focus" ? "Enfoque" : "Pausa");
+  document.title = values.join(':') + ' · ' +
+    (state.phase === 'focus' ? 'Enfoque' : 'Pausa');
 }
 
 function renderUI() {
   root.dataset.phase = state.phase;
 
-  document.querySelectorAll(".mode")
-    .forEach(button => {
-      button.setAttribute(
-        "aria-pressed",
-        String(button.dataset.mode === state.phase)
-      );
-    });
-
-  startButton.textContent =
-    state.deadline !== null
-      ? "Pausar"
-      : state.remainingMs < duration(state.phase)
-        ? "Continuar"
-        : "Iniciar";
-
-  statusText.textContent =
-    state.notice +
-    (
-      state.sound && audioWarning
-        ? " " + audioWarning
-        : ""
+  document.querySelectorAll('.mode').forEach(button => {
+    button.setAttribute(
+      'aria-pressed',
+      String(button.dataset.mode === state.phase)
     );
+  });
 
-  const completedInCycle =
-    state.completed % SESSIONS_PER_CYCLE;
+  startButton.textContent = state.deadline !== null
+    ? 'Pausar'
+    : state.remainingMs < duration(state.phase)
+      ? 'Continuar'
+      : 'Iniciar';
 
-  const count =
-    state.phase === "long" &&
+  statusText.textContent = state.notice +
+    (state.sound && audioWarning ? ' ' + audioWarning : '');
+
+  const completedInCycle = state.completed % SESSIONS_PER_CYCLE;
+
+  const count = state.phase === 'long' &&
     state.completed > 0 &&
     completedInCycle === 0
       ? 4
       : completedInCycle;
 
-  document.querySelectorAll(".dot")
-    .forEach((dot, index) => {
-      dot.classList.toggle("done", index < count);
-    });
+  document.querySelectorAll('.dot').forEach((dot, i) => {
+    dot.classList.toggle('done', i < count);
+  });
 
-  document.querySelector(".cycle").setAttribute(
-    "aria-label",
-    count + " de 4 sesiones completadas"
+  document.querySelector('.cycle').setAttribute(
+    'aria-label',
+    count + ' de 4 sesiones completadas'
   );
 
-  soundButton.setAttribute(
-    "aria-pressed",
-    String(state.sound)
-  );
+  soundButton.setAttribute('aria-pressed', String(state.sound));
 
-  soundButton.setAttribute(
-    "aria-label",
-    state.sound
-      ? "Silenciar sonidos"
-      : "Activar y probar sonidos"
-  );
+  const soundLabel = state.sound
+    ? 'Silenciar sonidos'
+    : 'Activar y probar sonidos';
 
-  soundButton.title = state.sound
-    ? "Silenciar sonidos"
-    : "Activar y probar sonidos";
+  soundButton.setAttribute('aria-label', soundLabel);
+  soundButton.title = soundLabel;
 
   soundButton.innerHTML =
     '<svg viewBox="0 0 24 24" aria-hidden="true">' +
     '<path d="M11 5 6 9H3v6h3l5 4Z"/>' +
-    (
-      state.sound
-        ? '<path d="M15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/>'
-        : '<path d="m16 9 5 6m0-6-5 6"/>'
-    ) +
-    "</svg>";
+    (state.sound
+      ? '<path d="M15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/>'
+      : '<path d="m16 9 5 6m0-6-5 6"/>') +
+    '</svg>';
 
   requestFit();
 }
@@ -1049,10 +869,9 @@ function settleAll() {
   renderDigits(false);
 
   displays.forEach(display => {
-    Array.from(display.element.children)
-      .forEach((card, index) => {
-        settle(card, display.value[index]);
-      });
+    Array.from(display.element.children).forEach((card, i) => {
+      settle(card, display.value[i]);
+    });
   });
 }
 
@@ -1069,8 +888,7 @@ function fit() {
 
   if (width <= 0 || height <= 0) return;
 
-  root.dataset.layout =
-    width < 220 ? "narrow" : "wide";
+  root.dataset.layout = width < 220 ? 'narrow' : 'wide';
 
   let low = 1;
   let high = 90;
@@ -1078,35 +896,24 @@ function fit() {
   for (let i = 0; i < 20; i++) {
     const unit = (low + high) / 2;
 
-    root.style.setProperty("--unit", unit + "px");
+    root.style.setProperty('--unit', unit + 'px');
+    root.style.setProperty('--gap', Math.max(2, unit * .07) + 'px');
 
-    root.style.setProperty(
-      "--gap",
-      Math.max(2, unit * .07) + "px"
-    );
-
-    const timer = document.querySelector(".timer");
+    const timer = document.querySelector('.timer');
 
     const fits =
       timer.scrollWidth <= width &&
       widget.scrollHeight <= height;
 
-    if (fits) {
-      low = unit;
-    } else {
-      high = unit;
-    }
+    if (fits) low = unit;
+    else high = unit;
   }
 
-  root.style.setProperty("--unit", low + "px");
-
-  root.style.setProperty(
-    "--gap",
-    Math.max(2, low * .07) + "px"
-  );
+  root.style.setProperty('--unit', low + 'px');
+  root.style.setProperty('--gap', Math.max(2, low * .07) + 'px');
 }
 
-startButton.addEventListener("click", () => {
+startButton.addEventListener('click', () => {
   if (completeIfDue()) {
     renderUI();
     settleAll();
@@ -1114,24 +921,23 @@ startButton.addEventListener("click", () => {
   }
 
   if (state.deadline !== null) {
-    void playSound("pause");
+    void playSound('pause');
 
     state.remainingMs = remainingMs();
     state.deadline = null;
-    state.notice =
-      "En pausa. Continúa cuando quieras.";
+    state.notice = 'En pausa. Continúa cuando quieras.';
   } else {
     void playSound(
       state.remainingMs < duration(state.phase)
-        ? "resume"
-        : "start"
+        ? 'resume'
+        : 'start'
     );
 
     state.deadline = Date.now() + state.remainingMs;
 
-    state.notice = state.phase === "focus"
-      ? "Una cosa a la vez."
-      : "Tiempo para descansar.";
+    state.notice = state.phase === 'focus'
+      ? 'Una cosa a la vez.'
+      : 'Tiempo para descansar.';
   }
 
   save();
@@ -1139,53 +945,50 @@ startButton.addEventListener("click", () => {
   renderDigits(false);
 });
 
-document.getElementById("reset")
-  .addEventListener("click", () => {
-    void playSound("reset");
+document.getElementById('reset').addEventListener('click', () => {
+  void playSound('reset');
 
+  state.deadline = null;
+  state.remainingMs = duration(state.phase);
+  state.notice = 'Etapa reiniciada.';
+
+  save();
+  renderUI();
+  settleAll();
+});
+
+document.querySelectorAll('.mode').forEach(button => {
+  button.addEventListener('click', () => {
+    const next = button.dataset.mode;
+
+    void playSound(next);
+
+    if (next === state.phase) return;
+
+    state.phase = next;
     state.deadline = null;
-    state.remainingMs = duration(state.phase);
-    state.notice = "Etapa reiniciada.";
+    state.remainingMs = duration(next);
+
+    state.notice = next === 'focus'
+      ? 'Listo para concentrarte.'
+      : 'Tu pausa está lista.';
 
     save();
     renderUI();
     settleAll();
   });
+});
 
-document.querySelectorAll(".mode")
-  .forEach(button => {
-    button.addEventListener("click", () => {
-      const next = button.dataset.mode;
-
-      void playSound(next);
-
-      if (next === state.phase) return;
-
-      state.phase = next;
-      state.deadline = null;
-      state.remainingMs = duration(next);
-
-      state.notice = next === "focus"
-        ? "Listo para concentrarte."
-        : "Tu pausa está lista.";
-
-      save();
-      renderUI();
-      settleAll();
-    });
-  });
-
-soundButton.addEventListener("click", () => {
+soundButton.addEventListener('click', () => {
   state.sound = !state.sound;
-  audioWarning = "";
+  audioWarning = '';
 
   save();
   renderUI();
 
-  // Confirma también al silenciar.
-  // Las siguientes acciones ya no emitirán sonido.
+  // Confirmación breve incluso al silenciar.
   void playSound(
-    state.sound ? "soundOn" : "soundOff",
+    state.sound ? 'soundOn' : 'soundOff',
     true
   );
 });
@@ -1196,60 +999,42 @@ renderUI();
 fit();
 
 setInterval(() => {
-  if (completeIfDue()) {
-    renderUI();
-  }
-
+  if (completeIfDue()) renderUI();
   renderDigits(!document.hidden);
 }, 200);
 
 new ResizeObserver(requestFit).observe(frame);
-
 document.fonts.ready.then(requestFit);
 
-document.addEventListener("visibilitychange", () => {
+document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
-    if (completeIfDue()) {
-      renderUI();
-    }
-
+    if (completeIfDue()) renderUI();
     settleAll();
     requestFit();
   }
 });
 
-window.addEventListener("pageshow", () => {
-  if (completeIfDue()) {
-    renderUI();
-  }
-
+window.addEventListener('pageshow', () => {
+  if (completeIfDue()) renderUI();
   settleAll();
   requestFit();
 });
 
-reduced.addEventListener("change", settleAll);
+reduced.addEventListener('change', settleAll);
 
-window.addEventListener("storage", event => {
-  if (
-    event.key !== STORAGE_KEY ||
-    !event.newValue
-  ) {
-    return;
-  }
+window.addEventListener('storage', event => {
+  if (event.key !== STORAGE_KEY || !event.newValue) return;
 
   try {
     const incoming = JSON.parse(event.newValue);
 
     if (valid(incoming)) {
       state = incoming;
-
       completeIfDue(Date.now(), false);
       renderUI();
       settleAll();
     }
-  } catch {
-    // Ignora estados incompletos o inválidos.
-  }
+  } catch (error) {}
 });
 </script>
 </body>
